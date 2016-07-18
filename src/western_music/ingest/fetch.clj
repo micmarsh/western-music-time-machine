@@ -1,4 +1,4 @@
-(ns western-music.ingest.maps
+(ns western-music.ingest.fetch
   (:require [western-music.util :as util]))
 
 (defprotocol Lookup
@@ -26,7 +26,7 @@
   (util/conditional-prewalk (partial instance? clojure.lang.IDeref) deref))
 
 (defn apply-spec [data spec]
-  (-> (merge-recursive data spec)
+  (-> (util/merge-recursive data spec)
       (apply-lookups)
       (resolve-results)))
 
@@ -38,6 +38,4 @@
                                            :same-greeting #'get-hello
                                            :var-gretting `get-hello}
                                 :place (constantly (future "async place"))})
-
-  
   )
