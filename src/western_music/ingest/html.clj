@@ -38,7 +38,7 @@
    since our generic parse is (map -> map)"
   (keyword (gensym)))
 
-(def html-parse-spec
+(def initial-composition-spec
   {:name (comp title->composition-name
                arbitrary-placeholder)
    :composer {:name (comp title->composer-name
@@ -46,8 +46,8 @@
 
 (defn parse-title [title]
   (-> {arbitrary-placeholder title}
-      (apply-spec html-parse-spec)
-      (select-keys (keys html-parse-spec))))
+      (apply-spec initial-composition-spec)
+      (select-keys (keys initial-composition-spec))))
 
 (defn initial-data
   "Convert the given html to a seqeunce of intial Compositions
