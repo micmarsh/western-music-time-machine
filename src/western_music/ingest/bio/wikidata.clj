@@ -10,6 +10,7 @@
 (def ^:const property-keys
   {:place-of-birth :P19
    :date-of-birth :P569
+   :country :P17
    :title :P373 ;; technically "Commons Category". Regardless, seems to be a
    ;; good way to cut to the chase and get an identifier
    })
@@ -44,7 +45,13 @@
    TODO extend w/ id-search specific error handling/conflict resolution"
   (comp :id first :search))
 
-(defn id-search
+(defmacro defcached
+  "Define a memoized + syncronized, single argument function"
+  [name doc args & body]
+  `(let [memoized# (memoize (fn [~(first args)] ~@body))]
+     (defn ~name [arg#] (locking arg# (memoized# arg#)))))
+
+(defcached id-search
   "Given a 'title' (a composer in current cases), return
    the wikidata entity id (example \"Q9695\")"
   [title]
@@ -53,9 +60,8 @@
        (body)
        (search-id-value)))
 
-(defn properties
-  "Given a wikidata id, return the map of associated properties
-   TODO: figure out why promise is super broken, just use callback for now"
+(defcached properties
+  "Given a wikidata id, return the map of associated properties"
   [id]
   (->> {:action "wbgetclaims" :entity id}
        (base-query)
@@ -74,6 +80,8 @@
   (value prop))
 
 (defmethod prop-value "time"
+  ;; TODO this should actually return a time that something else can
+  ;; pull a year out of 
   [prop]
   (-> prop
       (value)
@@ -85,10 +93,40 @@
   (let [id (str "Q" (:numeric-id (value prop)))]
     (properties id)))
 
+(defmethod prop-value :default
+  [prop]
+  (throw (ex-info "Encountered value of unknown type" {:raw-prop prop
+                                                       :value (value prop)})))
+
 (defn lookup-year [data]
   (let [who (:name (:composer data))]
     (->> (id-search who)
          (properties)
          (property :date-of-birth)
+         (first)
+         (prop-value))))
+
+(defn lookup-city [data]
+  (let [who (:name (:composer data))]
+    (->> (id-search who)
+         (properties)
+         (property :place-of-birth)
+         (first)
+         (prop-value)
+         (property :title)
+         (first)
+         (prop-value))))
+
+(defn lookup-nation [data]
+  (let [who (:name (:composer data))]
+    (->> (id-search who)
+         (properties)
+         (property :place-of-birth)
+         (first)
+         (prop-value)
+         (property :country)
+         (first)
+         (prop-value)
+         (property :title)
          (first)
          (prop-value))))
