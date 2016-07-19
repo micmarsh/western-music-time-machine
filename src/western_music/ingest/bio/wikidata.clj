@@ -1,5 +1,5 @@
 (ns western-music.ingest.bio.wikidata
-  (:require [org.httpkit.client :as http]
+  (:require [clj-http.lite.client :as http]
             [clojure.string :as str]
             [cheshire.core :as json]))
 
@@ -26,23 +26,15 @@
                                :property-keys property-keys})))
           default)))
 
-(defmacro defasync [name doc args & body]
-  `(defn ~name ~doc
-     ([~@(drop-last args)]
-        (let [p# (promise)]
-          (~name ~@(drop-last args) (fn [val#] (p# val#) val#))
-          p#))
-     ([~@args] ~@body)))
-
 (def id-print #(do (println %) %))
 
-(defasync base-query
+(defn base-query
   "GET query to wikidata with the given parameters"
-  [params callback]
-  (http/get base-url {:query-params (merge {:language "en"
-                                            :format "json"}
-                                           params)}
-            callback))
+  [params]
+  (http/get base-url
+            {:query-params (merge {:language "en"
+                                   :format "json"}
+                                  params)}))
 
 (defn body [http-response]
   (-> http-response (:body) (json/decode true)))
@@ -52,69 +44,51 @@
    TODO extend w/ id-search specific error handling/conflict resolution"
   (comp :id first :search))
 
-(defasync id-search
+(defn id-search
   "Given a 'title' (a composer in current cases), return
    the wikidata entity id (example \"Q9695\")"
-  [title callback]
-  (base-query {:action "wbsearchentities" :search title}
-              (comp callback search-id-value body)))
+  [title]
+  (->> {:action "wbsearchentities" :search title}
+       (base-query)
+       (body)
+       (search-id-value)))
 
-(defasync properties
+(defn properties
   "Given a wikidata id, return the map of associated properties
    TODO: figure out why promise is super broken, just use callback for now"
-  [id callback]
-  (base-query {:action "wbgetclaims" :entity id}
-              (comp callback :claims body)))
+  [id]
+  (->> {:action "wbgetclaims" :entity id}
+       (base-query)
+       (body)
+       (:claims)))
 
-(defmulti prop-value* (fn [prop _] (:datatype (:mainsnak prop))))
+(defmulti prop-value (comp :datatype :mainsnak))
 
 (defn year [string-time]
   (apply str (take 4 (rest string-time))))
 
 (def value (comp :value :datavalue :mainsnak))
 
-(defmethod prop-value* "string"
-  [prop callback]
-  (callback (value prop)))
+(defmethod prop-value "string"
+  [prop]
+  (value prop))
 
-(defmethod prop-value* "time"
-  [prop callback]
+(defmethod prop-value "time"
+  [prop]
   (-> prop
       (value)
       (:time)
-      (year)
-      (callback)))
+      (year)))
 
-(defmethod prop-value* "wikibase-item"
-  [prop callback]
+(defmethod prop-value "wikibase-item"
+  [prop]
   (let [id (str "Q" (:numeric-id (value prop)))]
-    (properties id callback)))
+    (properties id)))
 
-(defasync prop-value
-  "Asynchronous, pull proper \"value\" representation out of a given
-   item. Extend with prop-value*"
-  [p c]
-  (prop-value* p c))
-
-
-#_(defn lookup-year [data]
+(defn lookup-year [data]
   (let [who (:name (:composer data))]
     (->> (id-search who)
          (properties)
          (property :date-of-birth)
          (first)
          (prop-value))))
-
-(defn lookup-year [data]
-  (let [who (:name (:composer data))
-        p (promise)]
-    (id-search who
-               (fn [id]
-                 (properties id
-                             (comp #(prop-value % (partial deliver p)) first (partial property :date-of-birth)))))
-    p))
-
-
-;; TODO hey, that shit was fuckin easy, now what to do about place?
-;; * from Liszt "Raiding", got the idea that "Commons Category" for
-;; place is city, another query 
