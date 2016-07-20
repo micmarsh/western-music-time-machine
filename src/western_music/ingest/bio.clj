@@ -23,18 +23,14 @@
 
   (def cache (atom {}))
   
-  (binding [util/*global-cache* cache]
-    (def full-results (doall (map get-stuff stuff))))
-
-  (def cache2 (atom {}))
-
   (def dont-use #{"Thomas Tallis" "Antonio Martin Y Col"
                   "Alonso de Mudarra";; doesn't
                   ;; have country of birth atrribute
                   "Anonymous" ;; obviously not a person
+                  "Dietrich Buxtehude" ;; DOB string is apparently not ISO
                   })
   
-  (binding [util/*global-cache* cache2]
+  (binding [util/*global-cache* cache]
     (def full-results
       (into []  (comp (remove (comp dont-use :name :composer)) (map get-stuff)) stuff)))
   )

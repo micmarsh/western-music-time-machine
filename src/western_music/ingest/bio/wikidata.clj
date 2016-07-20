@@ -44,7 +44,10 @@
    "John Milford Rutter" "John Rutter"
    "Antonio Martin Y Col" "Antonio Martín y Coll"
    "Alonso de Mudarra" "Alonso Mudarra"
-   "Joao Domingos Bomtempo" "João Domingos Bomtempo"})
+   "Joao Domingos Bomtempo" "João Domingos Bomtempo"
+   "Frédéric Franciszek Chopin" "Frédéric Chopin"
+   "A Claude Debussy" "Claude Debussy"
+   "Isaac Albeniz" "Isaac Albéniz"})
 
 (defn translate [search-term]
   (get translations search-term search-term))
