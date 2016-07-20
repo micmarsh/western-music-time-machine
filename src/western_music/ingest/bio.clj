@@ -10,19 +10,31 @@
   (def stuff
     [(throw (ex-info "Add real data here" {}))])
 
-  (require '[western-music.ingest
+  (require '[western-music.ingest            
              [fetch :as fetch]
-             [bio :as bio]])
+             [bio :as bio]]
+           '[western-music.ingest.bio.wikidata :as bio.wiki]
+           '[western-music.util :as util])
 
   (defn get-stuff [stuff]
     (fetch/apply-spec stuff {:composer {:birth bio/biography-spec}}))
 
   (get-stuff (first stuff))
-  
-  (doall (take 4 (map #(fetch/apply-spec % {:composer {:birth bio/biography-spec}}) stuff)))
-  ;; TODO this reveals an exception, it appears to by in lookup-city.
-  ;; Most likely is id-search just not working out, null propogating
 
-  ;; Also getting a NPE in `wiki/properties call (when working
-  ;; backwards), so that's an interesting development
+  (def cache (atom {}))
+  
+  (binding [util/*global-cache* cache]
+    (def full-results (doall (map get-stuff stuff))))
+
+  (def cache2 (atom {}))
+
+  (def dont-use #{"Thomas Tallis" "Antonio Martin Y Col"
+                  "Alonso de Mudarra";; doesn't
+                  ;; have country of birth atrribute
+                  "Anonymous" ;; obviously not a person
+                  })
+  
+  (binding [util/*global-cache* cache2]
+    (def full-results
+      (into []  (comp (remove (comp dont-use :name :composer)) (map get-stuff)) stuff)))
   )

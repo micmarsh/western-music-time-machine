@@ -14,15 +14,30 @@
      (fn [v] (if (pred? v) (f v) v))
      data)))
 
+
+(def ^:dynamic *global-cache* nil)
+
+(defn debug-memoize
+  "Allows optional debugging override of cache"
+  [f]
+  (let [cache (atom {})]
+    (fn [& args]
+      (let [mem (or *global-cache* cache)]
+        (if-let [e (find @mem args)]
+          (val e)
+          (let [ret (apply f args)]
+            (swap! mem assoc args ret)
+            ret))))))
+
 (defmacro defcached
   "Define a memoized + syncronized, single argument function"
   [name doc args & body]
-  `(let [memoized# (memoize (fn [~(first args)] ~@body))]
+  `(let [memoized# (debug-memoize (fn [~(first args)] ~@body))]
      (defn ~name [arg#] (locking arg# (memoized# arg#)))))
 
 (comment
   (merge-with merge {:foo {:bar {:baz "yo"}}} {:foo {:bar {:hello "world"}}})
 
   (merge-recursive {:foo {:bar {:baz "yo"}}} {:foo {:bar {:hello "world"}}})
-  
+
   )

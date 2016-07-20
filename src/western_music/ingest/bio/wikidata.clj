@@ -31,11 +31,31 @@
       (throw (ex-info "Empty search response" {::search body}))
       (-> results first :id))))
 
+(def ^:const translations
+  {"Antonín Dvorak" "Antonín Dvořák"
+   "Jean-Baptista Lully" "Jean-Baptiste Lully"
+   "Ralph Vaughn Williams" "Ralph Vaughan Williams"
+   "Pyotr Il'yich Tchaikovsky" "Pyotr Ilyich Tchaikovsky"
+   "Sergey Prokofiev" "Sergei Prokofiev"
+   "Sergei Rachmaninov" "Sergei Rachmaninoff"
+   "Nikolay Andreyevich Rimsky-Korsakov" "Nikolai Rimsky-Korsakov"
+   "Alexander Porfir'yevich Borodin" "Alexander Borodin"
+   "Cesar Franck" "César Franck"
+   "John Milford Rutter" "John Rutter"
+   "Antonio Martin Y Col" "Antonio Martín y Coll"
+   "Alonso de Mudarra" "Alonso Mudarra"
+   "Joao Domingos Bomtempo" "João Domingos Bomtempo"})
+
+(defn translate [search-term]
+  (get translations search-term search-term))
+
 (defcached id-search
   "Given a 'title' (a composer in current cases), return
    the wikidata entity id (example \"Q9695\")"
   [title]
-  (let [response (base-query {:action "wbsearchentities" :search title})]
+  (println "searchin for" title)
+  (let [search-term (translate title)
+        response (base-query {:action "wbsearchentities" :search search-term})]
     (try
       (search-id-value (body response))
       (catch clojure.lang.ExceptionInfo e
@@ -48,6 +68,7 @@
 (defcached properties-query
   "Given a wikidata id, return the map of associated properties"
   [id]
+  (println "yooo id" id)
   (->> {:action "wbgetclaims" :entity id}
        (base-query)
        (body)
@@ -64,12 +85,16 @@
 
 (defn property-key
   [key properties]
-  (get properties
-       (or (get property-keys key)
-           (throw (ex-info "Property key doesn't exist"
-                           {:key key
-                            :properties properties
-                            :property-keys property-keys})))))
+  (or (get properties
+           (or (get property-keys key)
+               (throw (ex-info "Property key doesn't exist"
+                               {:key key
+                                :properties properties
+                                :property-keys property-keys}))))
+      (throw (ex-info (str "Couldn't find value " key)
+                      {:key key
+                       :translated-key (get property-keys key)
+                       :properties properties}))))
 
 (defn property
   [key properties]
