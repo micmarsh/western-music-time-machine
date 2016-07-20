@@ -9,11 +9,14 @@
 (comment
   (def stuff
     [(throw (ex-info "Add real data here" {}))])
-  
-  (western-music.ingest.fetch/apply-spec (first stuff)
-                                         {:composer {:birth western-music.ingest.bio/biography-spec}})
 
-  (time (take 5 (doall (map #(western-music.ingest.fetch/apply-spec % {:composer {:birth western-music.ingest.bio/biography-spec}}) stuff))))
+  (require '[western-music.ingest
+             [fetch :as fetch]
+             [bio :as bio]])
+  
+  (fetch/apply-spec (first stuff) {:composer {:birth bio/biography-spec}})
+
+  (doall (take 4 (map #(fetch/apply-spec % {:composer {:birth bio/biography-spec}}) stuff)))
   ;; TODO this reveals an exception, it appears to by in lookup-city.
   ;; Most likely is id-search just not working out, null propogating
 

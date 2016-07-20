@@ -3,31 +3,13 @@
             [clojure.string :as str]
             [cheshire.core :as json]))
 
-(declare lookup-nation lookup-city)
-
 (def ^:const base-url "https://www.wikidata.org/w/api.php")
 
 (def ^:const property-keys
   {:place-of-birth :P19
    :date-of-birth :P569
    :country :P17
-   :title :P373 ;; technically "Commons Category". Regardless, seems to be a
-   ;; good way to cut to the chase and get an identifier
-   })
-
-(defn property
-  ([key properties]
-     (property key properties nil))
-  ([key properties default]
-     (get properties
-          (or (get property-keys key)
-              (throw (ex-info "Property key doesn't exist"
-                              {:key key
-                               :properties property
-                               :property-keys property-keys})))
-          default)))
-
-(def id-print #(do (println %) %))
+   :title :P373})
 
 (defn base-query
   "GET query to wikidata with the given parameters"
@@ -70,6 +52,22 @@
 
 (defmulti prop-value (comp :datatype :mainsnak))
 
+(defn property-key
+  [key properties]
+  (get properties
+       (or (get property-keys key)
+           (throw (ex-info "Property key doesn't exist"
+                           {:key key
+                            :properties properties
+                            :property-keys property-keys})))))
+
+(defn property
+  [key properties]
+  (-> (property-key key properties)
+      (first)
+      (prop-value)))
+
+
 (defn year [string-time]
   (apply str (take 4 (rest string-time))))
 
@@ -95,38 +93,27 @@
 
 (defmethod prop-value :default
   [prop]
-  (throw (ex-info "Encountered value of unknown type" {:raw-prop prop
-                                                       :value (value prop)})))
+  (throw (ex-info "Encountered value of unknown type"
+                  {:raw-prop prop
+                   :value (value prop)})))
 
 (defn lookup-year [data]
   (let [who (:name (:composer data))]
     (->> (id-search who)
          (properties)
-         (property :date-of-birth)
-         (first)
-         (prop-value))))
+         (property :date-of-birth))))
 
 (defn lookup-city [data]
   (let [who (:name (:composer data))]
     (->> (id-search who)
          (properties)
          (property :place-of-birth)
-         (first)
-         (prop-value)
-         (property :title)
-         (first)
-         (prop-value))))
+         (property :title))))
 
 (defn lookup-nation [data]
   (let [who (:name (:composer data))]
     (->> (id-search who)
          (properties)
          (property :place-of-birth)
-         (first)
-         (prop-value)
          (property :country)
-         (first)
-         (prop-value)
-         (property :title)
-         (first)
-         (prop-value))))
+         (property :title))))
