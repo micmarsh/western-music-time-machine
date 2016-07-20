@@ -22,19 +22,28 @@
   (-> http-response (:body) (json/decode true)))
 
 ;; "Querying", still basically HTTP stuff
-(def search-id-value
+(defn search-id-value
   "Get the id \"Q-whatever\" from a wikidata response
    TODO extend w/ id-search specific error handling/conflict resolution"
-  (comp :id first :search))
+  [body]
+  (let [results (:search body)]
+    (if (empty? results)
+      (throw (ex-info "Empty search response" {::search body}))
+      (-> results first :id))))
 
 (defcached id-search
   "Given a 'title' (a composer in current cases), return
    the wikidata entity id (example \"Q9695\")"
   [title]
-  (->> {:action "wbsearchentities" :search title}
-       (base-query)
-       (body)
-       (search-id-value)))
+  (let [response (base-query {:action "wbsearchentities" :search title})]
+    (try
+      (search-id-value (body response))
+      (catch clojure.lang.ExceptionInfo e
+        (if (contains? (ex-data e) ::search)
+          (throw (ex-info (str "Bad search results for " title)
+                          {:search-term title
+                           :http-response response}))
+          (throw e))))))
 
 (defcached properties-query
   "Given a wikidata id, return the map of associated properties"

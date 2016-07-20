@@ -13,9 +13,12 @@
   (require '[western-music.ingest
              [fetch :as fetch]
              [bio :as bio]])
-  
-  (fetch/apply-spec (first stuff) {:composer {:birth bio/biography-spec}})
 
+  (defn get-stuff [stuff]
+    (fetch/apply-spec stuff {:composer {:birth bio/biography-spec}}))
+
+  (get-stuff (first stuff))
+  
   (doall (take 4 (map #(fetch/apply-spec % {:composer {:birth bio/biography-spec}}) stuff)))
   ;; TODO this reveals an exception, it appears to by in lookup-city.
   ;; Most likely is id-search just not working out, null propogating
