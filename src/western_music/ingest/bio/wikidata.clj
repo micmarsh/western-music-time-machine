@@ -1,15 +1,14 @@
 (ns western-music.ingest.bio.wikidata
   (:require [clj-http.lite.client :as http]
+            [western-music.util :refer [defcached]]
+            [clj-time
+             [core :as t]
+             [format :as f]]
             [clojure.string :as str]
             [cheshire.core :as json]))
 
+;; HTTP API interaction
 (def ^:const base-url "https://www.wikidata.org/w/api.php")
-
-(def ^:const property-keys
-  {:place-of-birth :P19
-   :date-of-birth :P569
-   :country :P17
-   :title :P373})
 
 (defn base-query
   "GET query to wikidata with the given parameters"
@@ -22,16 +21,11 @@
 (defn body [http-response]
   (-> http-response (:body) (json/decode true)))
 
+;; "Querying", still basically HTTP stuff
 (def search-id-value
   "Get the id \"Q-whatever\" from a wikidata response
    TODO extend w/ id-search specific error handling/conflict resolution"
   (comp :id first :search))
-
-(defmacro defcached
-  "Define a memoized + syncronized, single argument function"
-  [name doc args & body]
-  `(let [memoized# (memoize (fn [~(first args)] ~@body))]
-     (defn ~name [arg#] (locking arg# (memoized# arg#)))))
 
 (defcached id-search
   "Given a 'title' (a composer in current cases), return
@@ -42,7 +36,7 @@
        (body)
        (search-id-value)))
 
-(defcached properties
+(defcached properties-query
   "Given a wikidata id, return the map of associated properties"
   [id]
   (->> {:action "wbgetclaims" :entity id}
@@ -50,7 +44,14 @@
        (body)
        (:claims)))
 
-(defmulti prop-value (comp :datatype :mainsnak))
+;; Reading/Coercing/Re-reading properties from query results
+(def ^:const property-keys
+  {:place-of-birth :P19
+   :date-of-birth :P569
+   :country :P17
+   :title :P373})
+
+(defmulti coerce-property (comp :datatype :mainsnak))
 
 (defn property-key
   [key properties]
@@ -65,55 +66,55 @@
   [key properties]
   (-> (property-key key properties)
       (first)
-      (prop-value)))
-
-
-(defn year [string-time]
-  (apply str (take 4 (rest string-time))))
+      (coerce-property)))
 
 (def value (comp :value :datavalue :mainsnak))
 
-(defmethod prop-value "string"
+(defmethod coerce-property "string"
   [prop]
   (value prop))
 
-(defmethod prop-value "time"
-  ;; TODO this should actually return a time that something else can
-  ;; pull a year out of 
+(defmethod coerce-property "time"
   [prop]
-  (-> prop
+  (->> prop
       (value)
       (:time)
-      (year)))
+      (f/parse (f/formatters :date-time-no-ms))))
 
-(defmethod prop-value "wikibase-item"
+(defmethod coerce-property "wikibase-item"
   [prop]
   (let [id (str "Q" (:numeric-id (value prop)))]
-    (properties id)))
+    (properties-query id)))
 
-(defmethod prop-value :default
+(defmethod coerce-property :default
   [prop]
   (throw (ex-info "Encountered value of unknown type"
                   {:raw-prop prop
                    :value (value prop)})))
 
+;; Functions exposed to rest of application
 (defn lookup-year [data]
   (let [who (:name (:composer data))]
     (->> (id-search who)
-         (properties)
-         (property :date-of-birth))))
+         (properties-query)
+         (property :date-of-birth)
+         (t/year))))
 
 (defn lookup-city [data]
   (let [who (:name (:composer data))]
     (->> (id-search who)
-         (properties)
+         (properties-query)
          (property :place-of-birth)
          (property :title))))
 
 (defn lookup-nation [data]
   (let [who (:name (:composer data))]
     (->> (id-search who)
-         (properties)
+         (properties-query)
          (property :place-of-birth)
          (property :country)
          (property :title))))
+
+(comment
+  (lookup-year {:composer {:name "Franz Liszt"}})
+  )

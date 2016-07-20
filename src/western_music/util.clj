@@ -14,6 +14,12 @@
      (fn [v] (if (pred? v) (f v) v))
      data)))
 
+(defmacro defcached
+  "Define a memoized + syncronized, single argument function"
+  [name doc args & body]
+  `(let [memoized# (memoize (fn [~(first args)] ~@body))]
+     (defn ~name [arg#] (locking arg# (memoized# arg#)))))
+
 (comment
   (merge-with merge {:foo {:bar {:baz "yo"}}} {:foo {:bar {:hello "world"}}})
 

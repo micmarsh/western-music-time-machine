@@ -7,5 +7,6 @@
   :profiles {:dev {:dependencies [[enlive "1.1.6"]
                                   [org.clojure/tools.cli "0.3.5"]
                                   [clj-http-lite "0.3.0"]
+                                  [clj-time "0.5.0"]
                                   [cheshire "5.6.3"]]
                    :aliases {"initial-ingest" ["run" "-m" "western-music.ingest.run/initial-ingest"]}}})
