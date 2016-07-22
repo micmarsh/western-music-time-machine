@@ -14,7 +14,6 @@
      (fn [v] (if (pred? v) (f v) v))
      data)))
 
-
 (def ^:dynamic *global-cache* nil)
 
 (defn debug-memoize

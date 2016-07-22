@@ -15,8 +15,8 @@
                                   [org.clojure/tools.cli "0.3.5"]
                                   [clj-http-lite "0.3.0"]
                                   [clj-time "0.5.0"]
-                                  [cheshire "5.6.3"]]
-
+                                  [cheshire "5.6.3"]
+                                  [re-frame "0.8.0-alpha2"]]
                    :cljsbuild {:builds {:client {:source-paths ["devsrc"]
                                                  :compiler     {:main "western-music.dev"
                                                                 :asset-path "js"
