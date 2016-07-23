@@ -21,7 +21,13 @@
 
 (def-event
   :select-blank
-  (path :ui :nation)
-  (constantly nil))
+  (path :ui)
+  (fn [ui _]
+   (dissoc ui :composer :nation)))
+
+(def-event
+  :select-composer
+  (path :ui :composer)
+  set-value-handler)
 
 ;; TODO Time selection is the next UI element to incorporate

@@ -25,27 +25,31 @@
       (or selected mouse-on))))
 
 (def-sub
-  :selected-compositions
+  :selected-composers
   :<- [:selected-nation]
   :<- [:raw-data]
   (fn [[nation data] _]
-    (filter (comp #{nation} nation-id) data)))
-
-(defn composition-title
-  [composition]
-  (let [composer-name (:name (:composer composition))
-        composition-name (:name composition)]
-    (str composer-name ": " composition-name)))
-
-(def-sub
-  :selected-composition-titles
-  :<- [:selected-compositions]
-  (fn [compositions _]
-    (->> compositions
+    (->> data
+         (filter (comp #{nation} nation-id))
          (map (comp :name :composer))
-;         (map composition-title)
          (distinct)
          (sort))))
+
+(def-sub
+  :selected-composer
+  :<- [:ui-state]
+  (fn [ui _]
+    (:composer ui)))
+
+(def-sub
+  :selected-compositions
+  :<- [:selected-composer]
+  :<- [:raw-data]
+  (fn [[composer data] _]
+    (into []
+          (comp (filter (comp #{composer} :name :composer))
+                (map :name))
+          data)))
 
 (def-sub
   :all-nations

@@ -34,6 +34,9 @@
   `(let [memoized# (debug-memoize (fn [~(first args)] ~@body))]
      (defn ~name [arg#] (locking arg# (memoized# arg#)))))
 
+(defmacro for' [& parts]
+  `(doall (for ~@parts)))
+
 (comment
   (merge-with merge {:foo {:bar {:baz "yo"}}} {:foo {:bar {:hello "world"}}})
 
