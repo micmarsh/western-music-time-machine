@@ -63,9 +63,9 @@
   "SUPER BIG HACK separating notion of display value and internal ref id
    will go a long way towards fixing this"
   [track]
-  (apply str
-         (clojure.string/join " - "
-                              (rest (clojure.string/split track #" - ")))))
+  (->> (clojure.string/split track #" - ")
+       (rest)
+       (clojure.string/join " - ")))
 
 (defn track-queue
   []
@@ -87,8 +87,20 @@
              {:on-click #(dispatch [:dequeue-track track])}
              "X"]]])]])))
 
+(defn player-controls
+  []
+  (let [paused? (subscribe [:paused?])]
+    (fn []
+      [:div
+       [:button {:on-click #(dispatch [:player-back])} "Back"]
+       (if @paused?
+         [:button {:on-click #(dispatch [:player-play])} "Play"]
+         [:button {:on-click #(dispatch [:player-pause])} "Pause"])
+       [:button {:on-click #(dispatch [:player-forward])} "Forward"]])))
+
 (defn wmtm-app []
   [:div
    [dummy-nation-list]
    [composer-list]
+   [player-controls]
    [track-queue]])

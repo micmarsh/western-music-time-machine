@@ -74,3 +74,9 @@
   :<- [:player]
   (fn [player _]
     (:playing player)))
+
+(def-sub
+  :paused?
+  :<- [:player]
+  (fn [player _]
+    (:paused player)))

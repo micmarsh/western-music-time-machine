@@ -5,7 +5,11 @@
 (def-event
   :initialize-data
   (constantly {:raw initial-data
-               :ui {}}))
+               :ui {:player {:queue []
+                             :paused true}
+                    :nation {:mouse-on nil
+                             :selected nil}
+                    :composer nil}}))
 
 (defn set-value-handler [_ [_ value]] value)
 
@@ -40,8 +44,9 @@
   ;; details here
   [{:keys [queue] :as player} composiition]
   (cond-> player
-          (not (contains? (set queue) composiition)) (update :queue (fnil conj []) composiition)
-          true (assoc :playing composiition)))
+          (not (contains? (set queue) composiition)) (update :queue conj composiition)
+          true (assoc :playing composiition
+                      :paused false)))
 
 (def-event
   :play-composition
@@ -55,13 +60,42 @@
   :enqueue-composition
   (path :ui :player :queue)
   (fn [q [_ composer composition]]
-    (conj (or q []) (str composer " - " composition))))
+    (conj q (str composer " - " composition))))
 
 (def-event
   :dequeue-track
   (path :ui :player :queue)
   (fn [q [_ track]]
     (into [] (remove #{track}) q)))
+
+(def-event
+  :player-play
+  (path :ui :player :paused)
+  (constantly false))
+
+(def-event
+  :player-pause
+  (path :ui :player :paused)
+  (constantly true))
+
+(def-event
+  :player-back
+  (path :ui :player)
+  (fn [{:keys [queue playing] :as player} _]
+    (let [where (.indexOf queue playing)]
+      (if (zero? where)
+        player
+        (assoc player :playing (queue (dec where)))))))
+
+(def-event
+  :player-forward
+  (path :ui :player)
+  (fn [{:keys [queue playing] :as player} _]
+    (let [where (.indexOf queue playing)
+          max-index (dec (count queue))]
+      (if (= where max-index)
+        player
+        (assoc player :playing (queue (inc where)))))))
 
 ;; TODO oh yeah, don't want to enqueue if already there, so that's
 ;; another thing that needs to go in here
