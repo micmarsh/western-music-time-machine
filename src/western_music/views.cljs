@@ -87,8 +87,20 @@
              {:on-click #(dispatch [:dequeue-track track])}
              "X"]]])]])))
 
+(defn player-controls
+  []
+  (let [paused? (subscribe [:paused?])]
+    (fn []
+      [:div
+       [:button {:on-click #(dispatch [:player-back])} "Back"]
+       (if @paused?
+         [:button {:on-click #(dispatch [:player-play])} "Play"]
+         [:button {:on-click #(dispatch [:player-pause])} "Pause"])
+       [:button {:on-click #(dispatch [:player-forward])} "Forward"]])))
+
 (defn wmtm-app []
   [:div
    [dummy-nation-list]
    [composer-list]
+   [player-controls]
    [track-queue]])

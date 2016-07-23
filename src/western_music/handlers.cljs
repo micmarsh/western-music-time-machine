@@ -63,6 +63,34 @@
   (fn [q [_ track]]
     (into [] (remove #{track}) q)))
 
+(def-event
+  :player-play
+  (path :ui :player :paused)
+  (constantly false))
+
+(def-event
+  :player-pause
+  (path :ui :player :paused)
+  (constantly true))
+
+(def-event
+  :player-back
+  (path :ui :player)
+  (fn [{:keys [queue playing] :as player} _]
+    (let [where (.indexOf queue playing)]
+      (if (zero? where)
+        player
+        (assoc player :playing (queue (dec where)))))))
+
+(def-event
+  :player-forward
+  (path :ui :player)
+  (fn [{:keys [queue playing] :as player} _]
+    (let [where (.indexOf queue playing)]
+      (if (= (count queue) (dec where))
+        player
+        (assoc player :playing (queue (inc where)))))))
+
 ;; TODO oh yeah, don't want to enqueue if already there, so that's
 ;; another thing that needs to go in here
 
