@@ -59,3 +59,18 @@
          (map nation-id)
          (distinct)
          (sort))))
+
+(def-sub :player :<- [:ui-state]
+  (fn [ui _] (:player ui)))
+
+(def-sub
+  :track-queue
+  :<- [:player]
+  (fn [player _]
+    (:queue player)))
+
+(def-sub
+  :current-track
+  :<- [:player]
+  (fn [player _]
+    (:playing player)))

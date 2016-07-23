@@ -30,4 +30,40 @@
   (path :ui :composer)
   set-value-handler)
 
+;; TODO compositions (and composers) now need IDs, because this
+;; string-based id'ing has its limits
+
+(defn play-composition
+  ;; TODO in addition to raw data, now should have data structs +
+  ;; validation for "player" b/c is slightly complex.
+  ;; Falling out of that is lib fns that abstract awasy a lot of the
+  ;; details here
+  [{:keys [queue] :as player} composiition]
+  (cond-> player
+          (not (contains? (set queue) composiition)) (update :queue (fnil conj []) composiition)
+          true (assoc :playing composiition)))
+
+(def-event
+  :play-composition
+  (path :ui :player)
+  (fn [player [_ composer composition]]
+    (play-composition
+     player
+     (str composer " - " composition))))
+
+(def-event
+  :enqueue-composition
+  (path :ui :player :queue)
+  (fn [q [_ composer composition]]
+    (conj (or q []) (str composer " - " composition))))
+
+(def-event
+  :dequeue-track
+  (path :ui :player :queue)
+  (fn [q [_ track]]
+    (into [] (remove #{track}) q)))
+
+;; TODO oh yeah, don't want to enqueue if already there, so that's
+;; another thing that needs to go in here
+
 ;; TODO Time selection is the next UI element to incorporate

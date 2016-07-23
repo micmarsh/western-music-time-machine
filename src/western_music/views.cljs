@@ -29,20 +29,66 @@
         [:ul
          (for' [composition @compositions]
            [:li {:key composition}
-            composition])]))))
+            [:div composition
+             [:button
+              {:on-click #(dispatch [:play-composition
+                                     parent-composer
+                                     composition])}
+              "PLAY"]
+             [:button
+              {:on-click #(dispatch [:enqueue-composition
+                                     parent-composer
+                                     composition])}
+              "ENQUEUE"]]])]))))
 
 (defn composer-list
   []
-  (let [composers (subscribe [:selected-composers])]
+  (let [composers (subscribe [:selected-composers])
+        nation (subscribe [:selected-nation])]
     (fn []
-      [:div#fake-track-list
-       [:ul
+      [:div
+       [:ul @nation
         (for' [composer @composers]
           [:li {:key composer}
            [:div {:on-click #(dispatch [:select-composer composer])} composer]
            [composition-list composer]])]])))
 
+(defn track-composer
+  "SUPER BIG HACK separating notion of display value and internal ref id
+   will go a long way towards fixing this"
+  [track]
+  (first (clojure.string/split track #" - ")))
+
+(defn track-composition
+  "SUPER BIG HACK separating notion of display value and internal ref id
+   will go a long way towards fixing this"
+  [track]
+  (apply str
+         (clojure.string/join " - "
+                              (rest (clojure.string/split track #" - ")))))
+
+(defn track-queue
+  []
+  (let [queue (subscribe [:track-queue])
+        current-track (subscribe [:current-track])]
+    (fn []
+      [:div
+       "Play Queue"
+       [:ul
+        (for' [track @queue]
+          [:li {:key track}
+           [:div track
+            (when-not (= track @current-track)
+              [:button {:on-click #(dispatch [:play-composition
+                                              (track-composer track)
+                                              (track-composition track)])}
+               "PLAY"])
+            [:button
+             {:on-click #(dispatch [:dequeue-track track])}
+             "X"]]])]])))
+
 (defn wmtm-app []
   [:div
    [dummy-nation-list]
-   [composer-list]])
+   [composer-list]
+   [track-queue]])
