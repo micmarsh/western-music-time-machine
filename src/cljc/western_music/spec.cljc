@@ -12,10 +12,17 @@
 (s/def :composer/name string?)
 
 (s/def ::place-time
-  (#?(:clj s/merge
-      :cljs merge) ::place ::time))
+  #?(:clj (s/merge ::place ::time)
+     :cljs (s/keys :req [:place/type
+                         :place/nation
+                         :place/city
+                         :time/type
+                         :time/year])))
 
 (s/def :composer/birth ::place-time)
+
+#?(:clj 
+(do
 
 (defmulti place-spec :place/type)
 
@@ -53,6 +60,8 @@
 
 (s/def ::place (s/multi-spec place-spec :place/type))
 (s/def ::time (s/multi-spec time-spec :time/type))
+
+))
 
 (comment
   (s/explain ::composition 
