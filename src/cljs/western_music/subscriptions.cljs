@@ -60,7 +60,9 @@
          (distinct)
          (sort))))
 
-(def-sub :player :<- [:ui-state]
+(def-sub
+  :player
+  :<- [:ui-state]
   (fn [ui _] (:player ui)))
 
 (def-sub

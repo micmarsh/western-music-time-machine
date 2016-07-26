@@ -9,8 +9,8 @@
   :plugins [[lein-cljsbuild "1.1.3"]
             [lein-figwheel "0.5.4-7"]]
 
-  :hooks [leiningen.cljsbuild]
-  
+  :source-paths ["src/clj" "src/cljc"]
+
   :profiles {:dev {:dependencies [[enlive "1.1.6"]
                                   [org.clojure/tools.cli "0.3.5"]
                                   [clj-http-lite "0.3.0"]
@@ -33,6 +33,6 @@
   
   :clean-targets ^{:protect false} ["resources/public/js" "target"]
   
-  :cljsbuild {:builds {:client {:source-paths ["src"] 
+  :cljsbuild {:builds {:client {:source-paths ["src/cljs" "src/cljc"] 
                                 :compiler     {:output-dir "resources/public/js"
                                                :output-to "resources/public/js/client.js"}}}})
