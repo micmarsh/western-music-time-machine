@@ -1,10 +1,19 @@
 (ns western-music.handlers
   (:require [western-music.data :refer [initial-data]]
-            [re-frame.core :refer [def-event path debug]]
-            [western-music.spec :as spec]))
+            [re-frame.core :refer [def-event path after debug]]
+            [western-music.spec :as spec]
+            [clojure.spec :as s]))
+
+(defn check-and-throw
+  "throw an exception if db doesn't match the spec."
+  [spec data]
+  (when-not (s/valid? spec data)
+    (throw (ex-info (str "spec check failed: " (s/explain-str spec data))
+                    {:problems (s/explain-data spec data) }))))
 
 (def-event
   :initialize-data
+  (after (comp (partial check-and-throw (s/coll-of ::spec/composition)) :raw))
   (constantly {:raw initial-data
                :ui {:player {:queue []
                              :paused true}
