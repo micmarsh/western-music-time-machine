@@ -1,6 +1,8 @@
 (ns western-music.handlers
   (:require [western-music.data :refer [initial-data]]
             [re-frame.core :refer [def-event path after debug]]
+            [western-music.lib.composition :as composition]
+            [western-music.util :as util]
             [western-music.spec :as spec]
             [clojure.spec :as s]))
 
@@ -16,10 +18,27 @@
   (after (comp (partial check-and-throw (s/coll-of ::spec/composition)) :raw))
   (constantly {:raw initial-data
                :ui {:player {:queue []
+                             :track-list []
                              :paused true}
                     :nation {:mouse-on nil
                              :selected nil}
                     :composer nil}}))
+
+(def gen-int-id (let [ids (atom 0)] #(swap! ids inc)))
+
+(defn composition->track
+  [composition]
+  {:track/type :track/no-player
+   :track/artist (composition/composer-name composition)
+   :track/title (composition/name composition)
+   :track/id (gen-int-id)})
+
+(defn set-track-list
+  [{compositions :raw :as all-data} composer]
+  (->> compositions
+       (filter (comp (partial util/string= composer) composition/composer-name))
+       (map composition->track)
+       (assoc-in all-data [:ui :player :track-list])))
 
 (defn set-value-handler [_ [_ value]] value)
 
@@ -41,8 +60,11 @@
 
 (def-event
   :select-composer
-  (path :ui :composer)
-  set-value-handler)
+  (after (comp (partial check-and-throw ::spec/track-list) :track-list :player :ui))
+  (fn [all-data [_ composer]]
+    (-> all-data
+        (set-track-list composer)
+        (assoc-in [:ui :composer] composer))))
 
 ;; TODO compositions (and composers) now need IDs, because this
 ;; string-based id'ing has its limits

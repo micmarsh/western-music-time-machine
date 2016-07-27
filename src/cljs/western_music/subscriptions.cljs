@@ -1,7 +1,8 @@
 (ns western-music.subscriptions
   (:require [re-frame.core :refer [def-sub]]
-            [western-music.lib.compsition :as composition]
-            [western-music.util :as util]))
+            [western-music.lib.composition :as composition]
+            [western-music.util :as util]
+            [western-music.protocols :as p]))
 
 (def-sub
   :raw-data
@@ -32,18 +33,19 @@
 (def-sub
   :selected-composer
   :<- [:ui-state]
-  (fn [ui _]
-    (:composer ui)))
+  (fn [ui _] (:composer ui)))
 
 (def-sub
-  :selected-compositions
-  :<- [:selected-composer]
-  :<- [:raw-data]
-  (fn [[composer data] _]
-    (into []
-          (comp (filter (comp #{composer} :name :composer))
-                (map :name))
-          data)))
+  :selected-tracks
+  :<- [:ui-state]
+  (fn [ui _] 
+    (mapv
+     (fn [t]
+       (reify p/DisplayData
+         (display [_] 
+           (str (:track/artist t) " - " (:track/title t)))
+         (id [_] (:track/id t))))
+     (-> ui :player :track-list))))
 
 (def-sub
   :all-nations

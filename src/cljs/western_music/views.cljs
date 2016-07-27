@@ -26,23 +26,21 @@
 
 (defn composition-list
   []
-  (let [compositions (subscribe [:selected-compositions])
+  (let [tracks (subscribe [:selected-tracks])
         selected-composer (subscribe [:selected-composer])]
     (fn [parent-composer]
-      (when (= @selected-composer parent-composer)
+      (when (= (p/id @selected-composer) 
+               (p/id parent-composer))
         [:ul
-         (for' [composition @compositions]
-           [:li {:key composition}
-            [:div composition
+         (for' [track @tracks
+                :let [id (p/id track)]]
+           [:li {:key id}
+            [:div (p/display track)
              [:button
-              {:on-click #(dispatch [:play-composition
-                                     parent-composer
-                                     composition])}
+              {:on-click #(dispatch [:play-track id])}
               "PLAY"]
              [:button
-              {:on-click #(dispatch [:enqueue-composition
-                                     parent-composer
-                                     composition])}
+              {:on-click #(dispatch [:enqueue-track id])}
               "ENQUEUE"]]])]))))
 
 (defn composer-list
@@ -51,10 +49,11 @@
         nation (subscribe [:selected-nation])]
     (fn []
       [:div
-       [:ul @nation
-        (for' [composer @composers]
-          [:li {:key composer}
-           [:div {:on-click #(dispatch [:select-composer composer])} composer]
+       [:ul (p/display @nation)
+        (for' [composer @composers
+               :let [id (p/id composer)]]
+          [:li {:key id}
+           [:div {:on-click #(dispatch [:select-composer id])} (p/display composer)]
            [composition-list composer]])]])))
 
 (defn track-composer
@@ -105,7 +104,7 @@
 (defn wmtm-app []
   [:div
    [dummy-nation-list]
-;   [composer-list]
+   [composer-list]
 ;   [player-controls]
 ;   [track-queue]
    ])
