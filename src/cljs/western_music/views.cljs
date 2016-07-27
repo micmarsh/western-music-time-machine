@@ -104,6 +104,5 @@
   [:div
    [dummy-nation-list]
    [composer-list]
-;   [player-controls]
-   [track-queue]
-   ])
+   [player-controls]
+   [track-queue]])

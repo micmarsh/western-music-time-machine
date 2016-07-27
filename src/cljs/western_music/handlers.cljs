@@ -13,9 +13,12 @@
     (throw (ex-info (str "spec check failed: " (s/explain-str spec data))
                     {:problems (s/explain-data spec data) }))))
 
+(def verify-raw-data
+  (after (comp (partial check-and-throw (s/coll-of ::spec/composition)) :raw)))
+
 (def-event
   :initialize-data
-  (after (comp (partial check-and-throw (s/coll-of ::spec/composition)) :raw))
+  verify-raw-data
   (constantly {:raw initial-data
                :ui {:player {:queue []
                              :track-list []
@@ -58,9 +61,12 @@
   (fn [ui _]
    (dissoc ui :composer :nation)))
 
+(def verify-track-list
+  (after (comp (partial check-and-throw ::spec/track-list) :track-list :player :ui)))
+
 (def-event
   :select-composer
-  (after (comp (partial check-and-throw ::spec/track-list) :track-list :player :ui))
+  verify-track-list
   (fn [all-data [_ composer]]
     (-> all-data
         (set-track-list composer)
@@ -120,7 +126,7 @@
   :player-back
   (path :ui :player)
   (fn [{:keys [queue playing] :as player} _]
-    (let [where (.indexOf queue playing)]
+    (let [where (.indexOf (mapv :track/id queue) (:track/id playing))]
       (if (zero? where)
         player
         (assoc player :playing (queue (dec where)))))))
@@ -129,13 +135,10 @@
   :player-forward
   (path :ui :player)
   (fn [{:keys [queue playing] :as player} _]
-    (let [where (.indexOf queue playing)
+    (let [where (.indexOf (mapv :track/id queue) (:track/id playing))
           max-index (dec (count queue))]
       (if (= where max-index)
         player
         (assoc player :playing (queue (inc where)))))))
-
-;; TODO oh yeah, don't want to enqueue if already there, so that's
-;; another thing that needs to go in here
 
 ;; TODO Time selection is the next UI element to incorporate
