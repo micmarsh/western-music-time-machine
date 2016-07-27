@@ -1,6 +1,7 @@
 (ns western-music.handlers
   (:require [western-music.data :refer [initial-data]]
-            [re-frame.core :refer [def-event path debug]]))
+            [re-frame.core :refer [def-event path debug]]
+            [western-music.spec :as spec]))
 
 (def-event
   :initialize-data
