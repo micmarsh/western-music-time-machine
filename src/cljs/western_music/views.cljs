@@ -1,5 +1,6 @@
 (ns western-music.views
-  (:require [re-frame.core :refer [subscribe dispatch]])
+  (:require [re-frame.core :refer [subscribe dispatch]]
+            [western-music.protocols :as p])
   (:require-macros [western-music.util :refer [for']]))
 
 (defn dummy-nation-list
@@ -8,16 +9,19 @@
     (let [nations (subscribe [:all-nations])]
       [:div#fake-map
        [:div
-        {:on-click #(dispatch [:select-blank])}
+        {:on-click #(dispatch [:select-blank])
+         :key "bs1"}
         "(Blank Space)"]
-       (for' [nation @nations]
-         [:div {:on-mouse #(dispatch [:focus-nation nation])
-                :on-click #(dispatch [:select-nation nation])
-                :key nation}
-          nation
+       (for' [nation @nations
+              :let [id (p/id nation)]]
+         [:div {:on-mouse #(dispatch [:focus-nation id])
+                :on-click #(dispatch [:select-nation id])
+                :key id}
+          (p/display nation)
           [:br]])
        [:div
-        {:on-click #(dispatch [:select-blank])}
+        {:on-click #(dispatch [:select-blank])
+         :key "bs2"}
         "(Blank Space)"]])))
 
 (defn composition-list
@@ -101,6 +105,7 @@
 (defn wmtm-app []
   [:div
    [dummy-nation-list]
-   [composer-list]
-   [player-controls]
-   [track-queue]])
+;   [composer-list]
+;   [player-controls]
+;   [track-queue]
+   ])

@@ -1,13 +1,7 @@
 (ns western-music.subscriptions
-  (:require [re-frame.core :refer [def-sub]]))
-
-(def nation-id
-  ;; TODO this goes somewhere else, as well as
-  ;; * some kind of UUID, more solid than name string
-  ;; * spec'ed input b/c this relies on a whole mess of nested data
-  ;; already
-  ;; * (related to last) spec'd in general for validating big 'ol data flow
-  (comp :nation :birth :composer))
+  (:require [re-frame.core :refer [def-sub]]
+            [western-music.lib.compsition :as composition]
+            [western-music.util :as util]))
 
 (def-sub
   :raw-data
@@ -30,8 +24,8 @@
   :<- [:raw-data]
   (fn [[nation data] _]
     (->> data
-         (filter (comp #{nation} nation-id))
-         (map (comp :name :composer))
+         (filter (comp (partial util/string= nation) composition/nation-id))
+         (map composition/composer-name)
          (distinct)
          (sort))))
 
@@ -56,7 +50,7 @@
   :<- [:raw-data]
   (fn [data _]
     (->> data
-         (map nation-id)
+         (map composition/nation-id)
          (distinct)
          (sort))))
 

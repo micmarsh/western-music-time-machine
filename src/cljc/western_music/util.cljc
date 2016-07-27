@@ -14,6 +14,13 @@
      (fn [v] (if (pred? v) (f v) v))
      data)))
 
+#?(:cljs
+   (defn string= [& strings]
+     (->> strings
+          (map #(str (js/String. %)))
+          (apply =)))
+   )
+
 (def ^:dynamic *global-cache* nil)
 
 (defn debug-memoize
@@ -29,17 +36,16 @@
             ret))))))
 
 (defmacro defcached
-  "Define a memoized + syncronized, single argument function"
-  [name doc args & body]
-  `(let [memoized# (debug-memoize (fn [~(first args)] ~@body))]
-     (defn ~name [arg#] (locking arg# (memoized# arg#)))))
+ "Define a memoized + syncronized, single argument function"
+ [name doc args & body]
+ `(let [memoized# (debug-memoize (fn [~(first args)] ~@body))]
+    (defn ~name [arg#] (locking arg# (memoized# arg#)))))
 
 (defmacro for' [& parts]
   `(doall (for ~@parts)))
 
 (comment
   (merge-with merge {:foo {:bar {:baz "yo"}}} {:foo {:bar {:hello "world"}}})
-
   (merge-recursive {:foo {:bar {:baz "yo"}}} {:foo {:bar {:hello "world"}}})
 
   )
