@@ -78,16 +78,15 @@
       [:div
        "Play Queue"
        [:ul
-        (for' [track @queue]
-          [:li {:key track}
-           [:div track
-            (when-not (= track @current-track)
-              [:button {:on-click #(dispatch [:play-composition
-                                              (track-composer track)
-                                              (track-composition track)])}
+        (for' [track @queue
+               :let [id (p/id track)]]
+          [:li {:key id}
+           [:div (p/display track)
+            (when-not (= id (p/id @current-track))
+              [:button {:on-click #(dispatch [:play-track id])}
                "PLAY"])
             [:button
-             {:on-click #(dispatch [:dequeue-track track])}
+             {:on-click #(dispatch [:dequeue-track id])}
              "X"]]])]])))
 
 (defn player-controls
@@ -106,5 +105,5 @@
    [dummy-nation-list]
    [composer-list]
 ;   [player-controls]
-;   [track-queue]
+   [track-queue]
    ])

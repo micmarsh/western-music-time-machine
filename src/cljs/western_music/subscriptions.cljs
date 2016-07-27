@@ -35,16 +35,18 @@
   :<- [:ui-state]
   (fn [ui _] (:composer ui)))
 
+(defn display-track-no-composer 
+  [track]
+  (reify p/DisplayData
+    (display [_] (:track/title track))
+    (id [_] (:track/id track))))
+
 (def-sub
   :selected-tracks
   :<- [:ui-state]
   (fn [ui _] 
     (mapv
-     (fn [t]
-       (reify p/DisplayData
-         (display [_] 
-           (str (:track/artist t) " - " (:track/title t)))
-         (id [_] (:track/id t))))
+     display-track-no-composer
      (-> ui :player :track-list))))
 
 (def-sub
@@ -61,17 +63,23 @@
   :<- [:ui-state]
   (fn [ui _] (:player ui)))
 
+(defn display-track [track]
+  (reify p/DisplayData
+    (display [_] 
+      (str (:track/artist track) " - " (:track/title track)))
+    (id [_] (:track/id track))))
+
 (def-sub
   :track-queue
   :<- [:player]
   (fn [player _]
-    (:queue player)))
+    (mapv display-track (:queue player))))
 
 (def-sub
   :current-track
   :<- [:player]
   (fn [player _]
-    (:playing player)))
+    (display-track (:playing player))))
 
 (def-sub
   :paused?

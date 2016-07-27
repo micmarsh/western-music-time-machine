@@ -66,39 +66,45 @@
         (set-track-list composer)
         (assoc-in [:ui :composer] composer))))
 
-;; TODO compositions (and composers) now need IDs, because this
-;; string-based id'ing has its limits
+(defn enqueue-track 
+  "Enqueues a track that hasn't already been added to the given collection"
+  [queue track]
+  (if (contains? (into #{} (map :track/id) queue) (:track/id track))
+    queue
+    (conj queue track)))
 
-(defn play-composition
-  ;; TODO in addition to raw data, now should have data structs +
-  ;; validation for "player" b/c is slightly complex.
-  ;; Falling out of that is lib fns that abstract awasy a lot of the
-  ;; details here
-  [{:keys [queue] :as player} composiition]
-  (cond-> player
-          (not (contains? (set queue) composiition)) (update :queue conj composiition)
-          true (assoc :playing composiition
-                      :paused false)))
+(defn play-track
+  [{:keys [queue] :as player} track]
+  (-> player
+      (update :queue enqueue-track track)
+      (assoc :playing track :paused false)))
+
+(defn track-lookup [player track-id]
+  (->> [:queue :track-list]
+       (sequence (comp (mapcat player)
+                       (filter (comp #{track-id} :track/id))))
+       (first)))
 
 (def-event
-  :play-composition
+  :play-track
   (path :ui :player)
-  (fn [player [_ composer composition]]
-    (play-composition
-     player
-     (str composer " - " composition))))
+  (fn [player [_ track-id]]
+    (->> track-id
+         (track-lookup player)
+         (play-track player))))
 
 (def-event
-  :enqueue-composition
-  (path :ui :player :queue)
-  (fn [q [_ composer composition]]
-    (conj q (str composer " - " composition))))
+  :enqueue-track
+  (path :ui :player)
+  (fn [player [_ track-id]]
+    (let [track (track-lookup player track-id)]
+      (update player :queue enqueue-track track))))
 
 (def-event
   :dequeue-track
   (path :ui :player :queue)
-  (fn [q [_ track]]
-    (into [] (remove #{track}) q)))
+  (fn [q [_ track-id]]
+    (into [] (remove (comp #{track-id} :track/id)) q)))
 
 (def-event
   :player-play
