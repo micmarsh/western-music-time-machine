@@ -57,6 +57,33 @@
 (s/def ::place (s/multi-spec place-spec :place/type))
 (s/def ::time (s/multi-spec time-spec :time/type))
 
+(defmulti track-spec :track/type)
+
+(defmethod track-spec :track/no-player
+  [_]
+  (s/keys :req [:track/type
+                :track/artist
+                :track/title
+                :track/id]))
+
+(s/def :track/type keyword?)
+
+(s/def :track/artist string?)
+
+(s/def :track/title string?)
+
+(s/def :track/id int?)
+
+(s/def ::track (s/multi-spec track-spec :track/type))
+
+(defn unique-track-ids? [tracks]
+  (= (count tracks)
+     (count (into #{} (map :track/id) tracks))))
+
+(s/def ::track-list
+  (s/and (s/coll-of ::track)
+         unique-track-ids?))
+
 (comment
   (s/explain ::composition 
              {:composition/name "Teh 5th" 
