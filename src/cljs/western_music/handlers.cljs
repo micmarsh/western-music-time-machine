@@ -1,144 +1,82 @@
 (ns western-music.handlers
   (:require [western-music.data :refer [initial-data]]
             [re-frame.core :refer [def-event path after debug]]
-            [western-music.lib.composition :as composition]
-            [western-music.util :as util]
             [western-music.spec :as spec]
+            [western-music.lib.ui :as ui]
             [clojure.spec :as s]))
-
-(defn check-and-throw
-  "throw an exception if db doesn't match the spec."
-  [spec data]
-  (when-not (s/valid? spec data)
-    (throw (ex-info (str "spec check failed: " (s/explain-str spec data))
-                    {:problems (s/explain-data spec data) }))))
-
-(def verify-raw-data
-  (after (comp (partial check-and-throw (s/coll-of ::spec/composition)) :raw)))
 
 (def-event
   :initialize-data
-  verify-raw-data
-  (constantly {:raw initial-data
-               :ui {:player {:queue []
-                             :track-list []
-                             :paused true}
-                    :nation {:mouse-on nil
-                             :selected nil}
-                    :composer nil}}))
-
-(def gen-int-id (let [ids (atom 0)] #(swap! ids inc)))
-
-(defn composition->track
-  [composition]
-  {:track/type :track/no-player
-   :track/artist (composition/composer-name composition)
-   :track/title (composition/name composition)
-   :track/id (gen-int-id)})
-
-(defn set-track-list
-  [{compositions :raw :as all-data} composer]
-  (->> compositions
-       (filter (comp (partial util/string= composer) composition/composer-name))
-       (map composition->track)
-       (assoc-in all-data [:ui :player :track-list])))
+  ui/verify-all-data
+  (ui/->initialize initial-data))
 
 (defn set-value-handler [_ [_ value]] value)
 
 (def-event
   :focus-nation
-  [(path :ui :nation :mouse-on)]
+  (path ui/nation-focus-path)
   set-value-handler)
 
 (def-event
   :select-nation
-  [(path :ui :nation :selected)]
+  (path ui/nation-selected-path)
   set-value-handler)
 
 (def-event
   :select-blank
-  (path :ui)
-  (fn [ui _]
-   (dissoc ui :composer :nation)))
-
-(def verify-track-list
-  (after (comp (partial check-and-throw ::spec/track-list) :track-list :player :ui)))
+  [ui/verify-all-data (path :data/ui)]
+  (fn [ui _] (ui/reset-selection ui)))
 
 (def-event
   :select-composer
-  verify-track-list
+  ui/verify-all-data
   (fn [all-data [_ composer]]
     (-> all-data
-        (set-track-list composer)
-        (assoc-in [:ui :composer] composer))))
+        (ui/track-list-by-composer composer)
+        (ui/set-composer composer))))
 
-(defn enqueue-track 
-  "Enqueues a track that hasn't already been added to the given collection"
-  [queue track]
-  (if (contains? (into #{} (map :track/id) queue) (:track/id track))
-    queue
-    (conj queue track)))
-
-(defn play-track
-  [{:keys [queue] :as player} track]
-  (-> player
-      (update :queue enqueue-track track)
-      (assoc :playing track :paused false)))
-
-(defn track-lookup [player track-id]
-  (->> [:queue :track-list]
-       (sequence (comp (mapcat player)
-                       (filter (comp #{track-id} :track/id))))
-       (first)))
-
+;; Track List and Queue manipulation
 (def-event
   :play-track
-  (path :ui :player)
+  (path ui/player-path)
   (fn [player [_ track-id]]
     (->> track-id
-         (track-lookup player)
-         (play-track player))))
+         (ui/player-track-lookup player)
+         (ui/player-play-track player))))
 
 (def-event
   :enqueue-track
-  (path :ui :player)
+  (path ui/player-path)
   (fn [player [_ track-id]]
-    (let [track (track-lookup player track-id)]
-      (update player :queue enqueue-track track))))
+    (->> track-id
+         (ui/player-track-lookup player)
+         (ui/player-enqueue-track player))))
 
 (def-event
   :dequeue-track
-  (path :ui :player :queue)
-  (fn [q [_ track-id]]
-    (into [] (remove (comp #{track-id} :track/id)) q)))
+  (path ui/player-path)
+  (fn [player [_ track-id]]
+    (ui/player-dequeue-track player track-id)))
 
+;; Player Controls
 (def-event
   :player-play
-  (path :ui :player :paused)
-  (constantly false))
+  [ui/verify-all-data (path ui/player-path)]
+  (fn [player _] (ui/player-play player)))
 
 (def-event
   :player-pause
-  (path :ui :player :paused)
-  (constantly true))
+  (path ui/player-path)
+  (fn [player _] (ui/player-pause player)))
 
 (def-event
   :player-back
-  (path :ui :player)
-  (fn [{:keys [queue playing] :as player} _]
-    (let [where (.indexOf (mapv :track/id queue) (:track/id playing))]
-      (if (zero? where)
-        player
-        (assoc player :playing (queue (dec where)))))))
+  [ui/verify-all-data (path ui/player-path)]
+  (fn [player _] (ui/player-back player)))
 
 (def-event
   :player-forward
-  (path :ui :player)
-  (fn [{:keys [queue playing] :as player} _]
-    (let [where (.indexOf (mapv :track/id queue) (:track/id playing))
-          max-index (dec (count queue))]
-      (if (= where max-index)
-        player
-        (assoc player :playing (queue (inc where)))))))
+  [ui/verify-all-data (path ui/player-path)]
+  (fn [player _] (ui/player-forward player)))
 
 ;; TODO Time selection is the next UI element to incorporate
