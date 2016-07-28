@@ -122,16 +122,6 @@
 (defn remove-track [coll track-id]
   (into [] (remove (comp #{track-id} :track/id)) coll)) ;(:player/queue player)
 
-(defn player-dequeue-track [player track-id]
-  (let [q (remove-track (:player/queue player) track-id)]
-    (merge player 
-           #:player{:queue q
-                    :paused (zero? (count q))})))
-
-(defn player-clear-queue [player]
-  (reduce player-dequeue-track player
-          (map :track/id (:player/queue player))))
-
 (defn player-play [player] 
   (let [q (:player/queue player)]
     (if (zero? (count q))
@@ -158,6 +148,18 @@
           max-index (dec (count q))]
     (cond-> player
       (not= where max-index) (player-set-playing (q (inc where)) (:player/paused player)))))
+
+(defn player-dequeue-track [player track-id]
+  (let [q (remove-track (:player/queue player) track-id)
+        empty (zero? (count q))]
+    (cond-> player
+      (-> player :player/playing :track/id (= track-id)) (player-forward)
+      empty (assoc :player/playing nil)
+      true (merge #:player{:queue q :paused empty}))))
+
+(defn player-clear-queue [player]
+  (reduce player-dequeue-track player
+          (map :track/id (:player/queue player))))
 
 (defn selected-nation [ui]
   (or (:ui.nation/selected (:ui/nation ui))

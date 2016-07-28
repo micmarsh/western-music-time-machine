@@ -54,13 +54,13 @@
 
 (def-event
   :dequeue-track
-  (path ui/player-path)
+  [ui/verify-all-data (path ui/player-path)]
   (fn [player [_ track-id]]
     (ui/player-dequeue-track player track-id)))
 
 (def-event
   :clear-queue
-  (path ui/player-path)
+  [ui/verify-all-data (path ui/player-path)]
   (fn [player _] (ui/player-clear-queue player)))
 
 ;; Player Controls
