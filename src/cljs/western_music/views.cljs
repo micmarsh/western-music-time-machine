@@ -77,6 +77,7 @@
     (fn []
       [:div
        "Play Queue"
+       [:button {:on-click #(dispatch [:clear-queue])} "X"]
        [:ul
         (for' [track @queue
                :let [id (p/id track)]]

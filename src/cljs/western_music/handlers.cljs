@@ -58,6 +58,11 @@
   (fn [player [_ track-id]]
     (ui/player-dequeue-track player track-id)))
 
+(def-event
+  :clear-queue
+  (path ui/player-path)
+  (fn [player _] (ui/player-clear-queue player)))
+
 ;; Player Controls
 (def-event
   :player-play

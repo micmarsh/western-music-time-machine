@@ -128,6 +128,10 @@
            #:player{:queue q
                     :paused (zero? (count q))})))
 
+(defn player-clear-queue [player]
+  (reduce player-dequeue-track player
+          (map :track/id (:player/queue player))))
+
 (defn player-play [player] 
   (let [q (:player/queue player)]
     (if (zero? (count q))
