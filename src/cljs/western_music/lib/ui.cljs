@@ -59,21 +59,11 @@
    #:data{:raw initial-data
           :ui blank}))
 
-(def composition->track
-  "TODO major changes / moving around of this once \"re-ingest\"
-   model is implemented"
-  (let [ids (atom 0)]
-    (fn [composition]
-      #:track{:type :track/no-player
-              :artist (composition/composer-name composition)
-              :title (composition/name composition)
-              :id (swap! ids inc)})))
-
 (defn track-list-by-composer
   [{compositions :data/raw :as all-data} composer]
   (->> compositions
        (filter (comp (partial util/string= composer) composition/composer-name))
-       (map composition->track)
+       (map composition/track)
        (assoc-in all-data [:data/ui :ui/player :player/track-list])))
 
 (def ^:const nation-focus-path

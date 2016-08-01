@@ -2,7 +2,12 @@
   (:require [clojure.spec :as s]))
 
 (s/def ::composition
-  (s/keys :req [:composition/name ::composer]))
+  (s/keys :req [:composition/id 
+                :composition/name
+                :composition/tracks 
+                ::composer]))
+
+(s/def :composition/id int?)
 
 (s/def :composition/name string?)
 
@@ -83,6 +88,8 @@
 (s/def ::track-list
   (s/and (s/coll-of ::track)
          unique-track-ids?))
+
+(s/def :composition/tracks ::track-list)
 
 (comment
   (s/explain ::composition 

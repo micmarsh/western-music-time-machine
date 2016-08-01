@@ -15,3 +15,8 @@
   (->> composition
        (::spec/composer)
        (:composer/name)))
+
+(defn track [composition]
+  (-> composition
+      (:composition/tracks)
+      (first)))
