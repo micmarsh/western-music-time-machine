@@ -139,11 +139,15 @@
     (cond-> player
       (not= where max-index) (player-set-playing (q (inc where)) (:player/paused player)))))
 
-(defn player-dequeue-track [player track-id]
-  (let [q (remove-track (:player/queue player) track-id)
+(defn player-dequeue-track [{queue :player/queue :as player} track-id]
+  (let [index (track-index queue {:track/id track-id})
+        max-index (dec (count queue))
+        q (remove-track queue track-id)
+        currently-playing? (-> player :player/playing :track/id (= track-id))
         empty (zero? (count q))]
     (cond-> player
-      (-> player :player/playing :track/id (= track-id)) (player-forward)
+      (and currently-playing? (= index max-index)) (player-back)
+      (and currently-playing? (not= index max-index)) (player-forward)
       empty (assoc :player/playing nil)
       true (merge #:player{:queue q :paused empty}))))
 
