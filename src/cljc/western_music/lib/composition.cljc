@@ -16,7 +16,21 @@
        (::spec/composer)
        (:composer/name)))
 
-(defn track [composition]
+(defmulti track
+  (fn [c] (into #{} (map :track/type) (:composition/tracks c))))
+
+(defmethod track #{:track/no-player :track/youtube}
+  [composition]
+  (->> composition
+       (:composition/tracks)
+       (filter (comp #{:track/youtube} :track/type))
+       (first)))
+
+(defmethod track :default
+  [composition]
   (-> composition
       (:composition/tracks)
       (first)))
+
+(defn add-track [composition track]
+  (update composition :composition/tracks (fnil conj []) track))

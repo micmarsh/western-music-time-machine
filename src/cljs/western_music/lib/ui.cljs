@@ -1,6 +1,7 @@
 (ns western-music.lib.ui
   (:require [re-frame.core :refer [after debug]]
             [western-music.lib.composition :as composition]
+            [western-music.lib.track]
             [western-music.spec :as spec]
             [western-music.util :as util]
             [clojure.spec :as s]))
