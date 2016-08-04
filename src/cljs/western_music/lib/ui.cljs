@@ -93,8 +93,6 @@
   ([player track] (player-set-playing player track false))
   ([player track paused]
    (dispatch [:new-track-playing track paused])
-   ;; TODO when paused = false, want to signal to player to load, but
-   ;; instantly pause new track
    (merge player #:player{:playing track :paused paused})))
 
 (defn player-play-track
@@ -130,18 +128,23 @@
 (defn track-index [coll track]
   (.indexOf (mapv :track/id coll) (:track/id track)))
 
+(defn player-index [{q :player/queue track :player/playing}]
+  (track-index q track))
+
+(defn player-at-end? [{q :player/queue :as player}]
+  (let [where (player-index player)
+        max-index (dec (count q))]
+    (= where max-index)))
+
 (defn player-back [player] 
   (let [q (:player/queue player)
         where (track-index q (:player/playing player))]
     (cond-> player
       (pos? where) (player-set-playing (q (dec where)) (:player/paused player)))))
 
-(defn player-forward [player]
-    (let [q (:player/queue player)
-          where (track-index q (:player/playing player))
-          max-index (dec (count q))]
-    (cond-> player
-      (not= where max-index) (player-set-playing (q (inc where)) (:player/paused player)))))
+(defn player-forward [{q :player/queue :as p}]
+  (cond-> p
+    (not (player-at-end? p)) (player-set-playing (q (inc (player-index p))) (:player/paused p))))
 
 (defn player-dequeue-track [{queue :player/queue :as player} track-id]
   (let [index (track-index queue {:track/id track-id})

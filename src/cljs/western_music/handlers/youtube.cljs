@@ -37,8 +37,7 @@
    {:height "240"
     :width "300"
     :events {:onReady player-ready
-             :onStateChange player-state-change}
-    :playerVars {:controls 0}}))
+             :onStateChange player-state-change}}))
 
 (defn initialize [& _]
   (if (boolean js/YouTubeReady)

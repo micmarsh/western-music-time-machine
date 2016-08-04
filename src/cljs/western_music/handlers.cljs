@@ -86,4 +86,10 @@
   [ui/verify-all-data (path ui/player-path)]
   (fn [player _] (ui/player-forward player)))
 
-;; TODO Time selection is the next UI element to incorporate
+(def-event
+  :current-track-ended
+  (path ui/player-path)
+  (fn [player _]
+    (if (ui/player-at-end? player)
+      (ui/player-pause player)
+      (ui/player-forward player))))
