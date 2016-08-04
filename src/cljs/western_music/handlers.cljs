@@ -1,9 +1,11 @@
 (ns western-music.handlers
   (:require [western-music.data :refer [initial-data]]
-            [re-frame.core :refer [def-event path after debug]]
+            [re-frame.core :refer [def-event path after debug dispatch]]
             [western-music.spec :as spec]
             [western-music.lib.ui :as ui]
-            [clojure.spec :as s]))
+            [clojure.spec :as s]
+            ;; implemenation-specific handlers
+            [western-music.handlers.youtube]))
 
 (def-event
   :initialize-data

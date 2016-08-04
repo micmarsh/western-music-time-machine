@@ -1,5 +1,5 @@
 (ns western-music.lib.ui
-  (:require [re-frame.core :refer [after debug]]
+  (:require [re-frame.core :refer [after debug dispatch]]
             [western-music.lib.composition :as composition]
             [western-music.lib.track]
             [western-music.spec :as spec]
@@ -90,10 +90,11 @@
   (update player :player/queue enqueue-track track))
 
 (defn player-set-playing 
-  "TODO this function is likely to be important for actually loading/playing
-  music files"
   ([player track] (player-set-playing player track false))
   ([player track paused]
+   (dispatch [:new-track-playing track])
+   ;; TODO when paused = false, want to signal to player to load, but
+   ;; instantly pause new track
    (merge player #:player{:playing track :paused paused})))
 
 (defn player-play-track
