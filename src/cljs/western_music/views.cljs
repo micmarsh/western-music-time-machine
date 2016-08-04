@@ -106,4 +106,5 @@
    [dummy-nation-list]
    [composer-list]
    [player-controls]
-   [track-queue]])
+   [track-queue]
+   [:div#youtube-player]])

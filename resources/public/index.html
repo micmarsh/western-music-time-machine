@@ -13,6 +13,10 @@
         window.onload = function () {
             western_music.core.main();
         }
+        window.onYouTubeIframeAPIReady = function () {
+            window.YouTubeReady = true;
+        }
     </script>
+    <script src="https://www.youtube.com/iframe_api"></script>
   </body>
 </html>
