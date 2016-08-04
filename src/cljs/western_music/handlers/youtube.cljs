@@ -72,3 +72,9 @@
   (fn [data _]
     (.pauseVideo player)
     data))
+
+(def-event
+  :all-tracks-cleared
+  (fn [data _]
+    (.cueVideoById player "")
+    data))

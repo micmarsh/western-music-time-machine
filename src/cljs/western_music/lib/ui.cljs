@@ -136,31 +136,33 @@
         max-index (dec (count q))]
     (= where max-index)))
 
-(defn player-back [player] 
-  (let [q (:player/queue player)
-        where (track-index q (:player/playing player))]
-    (cond-> player
-      (pos? where) (player-set-playing (q (dec where)) (:player/paused player)))))
+(def player-at-beginning? (comp zero? player-index))
 
-(defn player-forward [{q :player/queue :as p}]
+(defn player-back [{q :player/queue paused? :player/paused :as p}]
   (cond-> p
-    (not (player-at-end? p)) (player-set-playing (q (inc (player-index p))) (:player/paused p))))
+    (not (player-at-beginning? p)) (player-set-playing (q (dec (player-index p))) paused?)))
 
-(defn player-dequeue-track [{queue :player/queue :as player} track-id]
-  (let [index (track-index queue {:track/id track-id})
-        max-index (dec (count queue))
-        q (remove-track queue track-id)
-        currently-playing? (-> player :player/playing :track/id (= track-id))
-        empty (zero? (count q))]
-    (cond-> player
-      (and currently-playing? (= index max-index)) (player-back)
-      (and currently-playing? (not= index max-index)) (player-forward)
-      empty (assoc :player/playing nil)
-      true (merge #:player{:queue q :paused empty}))))
+(defn player-forward [{q :player/queue paused? :player/paused :as p}]
+  (cond-> p
+    (not (player-at-end? p)) (player-set-playing (q (inc (player-index p))) paused?)))
+
+(defn currently-playing? [player track-id]
+  (-> player :player/playing :track/id (= track-id)))
 
 (defn player-clear-queue [player]
-  (reduce player-dequeue-track player
-          (map :track/id (:player/queue player))))
+  (dispatch [:all-tracks-cleared])
+  (-> player
+      (update :player/queue empty)
+      (merge #:player{:playing nil :paused true})))
+
+(defn player-dequeue-track [{queue :player/queue :as player} track-id]
+  (let [q (remove-track queue track-id)
+        empty (zero? (count q))]
+    (cond-> player
+      (and (currently-playing? player track-id) (player-at-end? player)) (player-back)
+      (and (currently-playing? player track-id) (not (player-at-end? player))) (player-forward)
+      empty (player-clear-queue)
+      true (assoc :player/queue q))))
 
 (defn selected-nation [ui]
   (or (:ui.nation/selected (:ui/nation ui))
