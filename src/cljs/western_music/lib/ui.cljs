@@ -116,13 +116,15 @@
 
 (defn player-play [player] 
   (let [q (:player/queue player)]
+    (dispatch [:current-track-playing])
     (if (zero? (count q))
       player
       (cond-> player
         (nil? (:player/playing player)) (player-set-playing (first q))
         true (assoc :player/paused false)))))
 
-(defn player-pause [player] 
+(defn player-pause [player]
+  (dispatch [:current-track-paused])
   (assoc player :player/paused true))
 
 (defn track-index [coll track]

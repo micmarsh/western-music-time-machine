@@ -59,3 +59,15 @@
     ;; to handle figwheel reloading action
     (.loadVideoById player (:track/youtube-id track))
     data))
+
+(def-event
+  :current-track-playing
+  (fn [data _]
+    (.playVideo player)
+    data))
+
+(def-event
+  :current-track-paused
+  (fn [data _]
+    (.pauseVideo player)
+    data))
