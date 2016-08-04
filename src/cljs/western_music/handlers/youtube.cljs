@@ -54,10 +54,12 @@
 
 (def-event
   :new-track-playing
-  (fn [data [_ track]]
+  (fn [data [_ {id :track/youtube-id} paused?]]
     (when (nil? (.-loadVideoById player))) ;; TODO something elegant
     ;; to handle figwheel reloading action
-    (.loadVideoById player (:track/youtube-id track))
+    (if paused?
+      (.cueVideoById player id)
+      (.loadVideoById player id))
     data))
 
 (def-event

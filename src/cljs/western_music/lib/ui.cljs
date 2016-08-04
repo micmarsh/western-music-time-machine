@@ -92,7 +92,7 @@
 (defn player-set-playing 
   ([player track] (player-set-playing player track false))
   ([player track paused]
-   (dispatch [:new-track-playing track])
+   (dispatch [:new-track-playing track paused])
    ;; TODO when paused = false, want to signal to player to load, but
    ;; instantly pause new track
    (merge player #:player{:playing track :paused paused})))
