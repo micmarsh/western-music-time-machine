@@ -89,7 +89,4 @@
 (def-event
   :current-track-ended
   (path ui/player-path)
-  (fn [player _]
-    (if (ui/player-at-end? player)
-      (ui/player-pause player)
-      (ui/player-forward player))))
+  (fn [player _] (ui/player-track-ended player)))

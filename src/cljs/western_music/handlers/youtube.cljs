@@ -4,10 +4,8 @@
 
 (def player)
 
-(def println' #(.log js/console %))
-
 (defn player-ready []
-  (println' "player ready"))
+  (println "player ready"))
 
 (def ^:const +video-ended+ 0)
 (def ^:const +video-playing+ 1)
@@ -29,8 +27,7 @@
 
 (defmethod player-state-change :default
   [e]
-  (println' (.-data e))
-  (println' "player state change"))
+  (println "player state change" (.-data e)))
 
 (def player-options
   (clj->js

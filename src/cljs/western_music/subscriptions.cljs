@@ -55,9 +55,11 @@
   :selected-tracks
   :<- [:ui-state]
   (fn [ui _] 
-    (mapv
-     display-track-no-composer
-     (ui/track-list ui))))
+    (let [queue (ui/player-queue (ui/player ui))
+          already-queued? (comp (set (map :track/id queue)) :track/id)]
+      (into [] (comp (remove already-queued?)
+                     (map display-track-no-composer))
+            (ui/track-list ui)))))
 
 (def-sub
   :player

@@ -164,6 +164,13 @@
       empty (player-clear-queue)
       true (assoc :player/queue q))))
 
+(defn player-track-ended
+  [{ended :player/playing :as p}]
+  (cond-> p
+    (player-at-end? p) (player-pause)
+    (not (player-at-end? p)) (player-forward)
+    true (update :player/queue remove-track (:track/id ended))))
+
 (defn selected-nation [ui]
   (or (:ui.nation/selected (:ui/nation ui))
       (:ui.nation/mouse-on (:ui/nation ui))))
