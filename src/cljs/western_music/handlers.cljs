@@ -5,7 +5,8 @@
             [western-music.lib.ui :as ui]
             [clojure.spec :as s]
             ;; implemenation-specific handlers
-            [western-music.handlers.youtube]))
+            [western-music.handlers.youtube]
+            [western-music.handlers.map]))
 
 (def-event
   :initialize-data

@@ -3,26 +3,13 @@
             [western-music.protocols :as p])
   (:require-macros [western-music.util :refer [for']]))
 
-#_(defn dummy-nation-list
-  []
-  (fn []
-    (let [nations (subscribe [:all-nations])]
-      [:div#fake-map
-       [:div
-        {:on-click #(dispatch [:select-blank])
-         :key "bs1"}
-        "(Blank Space)"]
-       (for' [nation @nations
-              :let [id (p/id nation)]]
-         [:div {:on-mouse #(dispatch [:focus-nation id])
-                :on-click #(dispatch [:select-nation id])
-                :key id}
-          (p/display nation)
-          [:br]])
-       [:div
-        {:on-click #(dispatch [:select-blank])
-         :key "bs2"}
-        "(Blank Space)"]])))
+(js/setTimeout
+ (fn []
+   (set! (.-onNationFocus (.-listeners js/map))
+         #(dispatch [:focus-nation %]))
+   (set! (.-onNationClick (.-listeners js/map))
+         #(dispatch [:select-nation %])))
+ 2000)
 
 (defn composition-list
   []
