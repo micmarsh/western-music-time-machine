@@ -3,7 +3,7 @@
             [western-music.protocols :as p])
   (:require-macros [western-music.util :refer [for']]))
 
-(defn dummy-nation-list
+#_(defn dummy-nation-list
   []
   (fn []
     (let [nations (subscribe [:all-nations])]
@@ -103,7 +103,6 @@
 
 (defn wmtm-app []
   [:div
-   [dummy-nation-list]
    [composer-list]
    [player-controls]
    [track-queue]

@@ -20,6 +20,7 @@
                    :cljsbuild {:builds {:client {:source-paths ["devsrc"]
                                                  :compiler     {:main "western-music.dev"
                                                                 :asset-path "js"
+                                                                :externs ["externjs/YOOOOOOOOOOO.js"]
                                                                 :optimizations :none
                                                                 :source-map true
                                                                 :source-map-timestamp true}}}}
