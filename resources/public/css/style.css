@@ -138,18 +138,20 @@ font-size:12px;
 line-height:16px;
 }
 
-#container {
-    margin:10px;
-    float:left;
+#app {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#app-body {
+    margin-top: 20px;
+    display: flex;
+    flex-flow: row wrap;
 }
 
 #non-map {
-    margin-top:10px;
-}
-
-#app {
-    max-width: 1000px;
-    margin: auto;
+    width:300px
 }
 
 a img {
@@ -157,8 +159,8 @@ border:none;
 }
 
 h1, h2, h3, h4, h5, h6{ margin-bottom:10px; font-weight:normal; }
-	h1{ font-size:26px; line-height:32px; font-family: 'DroidSansRegular', Helvetica, Arial , sans-serif; }
-	p, ul{margin-bottom:10px;}
+h1{ font-size:26px; line-height:32px; font-family: 'DroidSansRegular', Helvetica, Arial , sans-serif; }
+p, ul{margin-bottom:10px;}
 
 /* ------ map
 -----------------------------------------------*/
@@ -166,14 +168,11 @@ h1, h2, h3, h4, h5, h6{ margin-bottom:10px; font-weight:normal; }
 .mapWrapper {
 margin:0 auto;
 position:relative;
-
 }
 
 #map {
 float:left;
 clear:both;
-width:930px;
-height:590px;
 }
 
 .point {

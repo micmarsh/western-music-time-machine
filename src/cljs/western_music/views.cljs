@@ -89,8 +89,8 @@
        [:button {:on-click #(dispatch [:player-forward])} "Forward"]])))
 
 (defn wmtm-app []
-  [:div
-   [:div#container
+  [:div#app-body
+   [:div#map-container
     [:div.mapWrapper
      [:div#map]
      [:div#text]]]
