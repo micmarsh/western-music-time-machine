@@ -1,0 +1,212 @@
+/* 
+html5doctor.com Reset Stylesheet
+v1.6.1
+Last Updated: 2010-09-17
+Author: Richard Clark - http://richclarkdesign.com 
+Twitter: @rich_clark
+*/
+
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section, summary,
+time, mark, audio, video {
+    margin:0;
+    border:0;
+    outline:0;
+    font-size:100%;
+    vertical-align:baseline;
+    background:transparent;
+}
+
+body {
+    line-height:1;
+}
+
+article,aside,details,figcaption,figure,
+footer,header,hgroup,menu,nav,section { 
+    display:block;
+}
+
+nav ul {
+    list-style:none;
+}
+
+blockquote, q {
+    quotes:none;
+}
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content:'';
+    content:none;
+}
+
+a {
+    margin:0;
+    padding:0;
+    font-size:100%;
+    vertical-align:baseline;
+    background:transparent;
+}
+
+/* change colours to suit your needs */
+ins {
+    background-color:#ff9;
+    color:#000;
+    text-decoration:none;
+}
+
+/* change colours to suit your needs */
+mark {
+    background-color:#ff9;
+    color:#000; 
+    font-style:italic;
+    font-weight:bold;
+}
+
+del {
+    text-decoration: line-through;
+}
+
+abbr[title], dfn[title] {
+    border-bottom:1px dotted;
+    cursor:help;
+}
+
+table {
+    border-collapse:collapse;
+    border-spacing:0;
+}
+
+/* change border colour to suit your needs */
+hr {
+    display:block;
+    height:1px;
+    border:0;   
+    border-top:1px solid #cccccc;
+    margin:1em 0;
+    padding:0;
+}
+
+input, select {
+    vertical-align:middle;
+}
+
+
+
+@font-face {
+    font-family: 'DroidSansRegular';
+    src: url('../fonts/droidsans-webfont.eot');
+    src: url('../fonts/droidsans-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/droidsans-webfont.woff') format('woff'),
+         url('../fonts/droidsans-webfont.ttf') format('truetype'),
+         url('../fonts/droidsans-webfont.svg#DroidSansRegular') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+@font-face {
+    font-family: 'DroidSansBold';
+    src: url('../fonts/droidsans-bold-webfont.eot');
+    src: url('../fonts/droidsans-bold-webfont.eot?#iefix') format('embedded-opentype'),
+         url('../fonts/droidsans-bold-webfont.woff') format('woff'),
+         url('../fonts/droidsans-bold-webfont.ttf') format('truetype'),
+         url('../fonts/droidsans-bold-webfont.svg#DroidSansBold') format('svg');
+    font-weight: normal;
+    font-style: normal;
+
+}
+
+
+
+/* ------ general
+-----------------------------------------------*/
+
+body {
+font-family: Helvetica, Arial , sans-serif;
+background:#f2f2f2;
+font-size:12px;
+line-height:16px;
+}
+
+#container {
+    margin:10px;
+    float:left;
+}
+
+#non-map {
+    margin-top:10px;
+}
+
+#app {
+    max-width: 1000px;
+    margin: auto;
+}
+
+a img {
+border:none;
+}
+
+h1, h2, h3, h4, h5, h6{ margin-bottom:10px; font-weight:normal; }
+	h1{ font-size:26px; line-height:32px; font-family: 'DroidSansRegular', Helvetica, Arial , sans-serif; }
+	p, ul{margin-bottom:10px;}
+
+/* ------ map
+-----------------------------------------------*/
+
+.mapWrapper {
+margin:0 auto;
+position:relative;
+
+}
+
+#map {
+float:left;
+clear:both;
+width:930px;
+height:590px;
+}
+
+.point {
+position:fixed;
+display:none;
+padding:10px 15px;
+background:#f2f2f2;
+font-size:14px;
+font-weight:bold;
+border:1px solid #262626;
+
+-moz-border-radius: 4px; /* FF1-3.6 */
+-webkit-border-radius: 4px; /* Saf3-4, iOS 1-3.2, Android <1.6 */
+ border-radius: 4px 4px 4px 4px; /* Opera 10.5, IE9, Saf5, Chrome, FF4, iOS 4, Android 2.1+ */    
+/* useful if you don't want a bg color from leaking outside the border: */        
+-moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box;
+}
+
+#text {
+ width:500px;
+ height: 380px;
+ overflow: auto;
+}
+
+.mapWrapper img {
+float: left;
+padding-right: 5px;
+padding-top: 2px;
+}
+
+.mapWrapper ul{
+margin-left: 30px;
+}
+
+
+

@@ -90,7 +90,12 @@
 
 (defn wmtm-app []
   [:div
-   [composer-list]
-   [player-controls]
-   [track-queue]
-   [:div#youtube-player]])
+   [:div#container
+    [:div.mapWrapper
+     [:div#map]
+     [:div#text]]]
+   [:div#non-map
+    [:div#youtube-player]    
+    [player-controls]
+    [composer-list]
+    [track-queue]]])

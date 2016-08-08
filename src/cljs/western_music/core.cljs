@@ -7,6 +7,8 @@
 
 (defn ^:export main
   []
-  (dispatch-sync [:initialize-data])
   (reagent/render [wmtm-app] (.getElementById js/document "app")
-                  (partial dispatch [:initialize-player])))
+                  (fn []
+                    (.initialize js/map)
+                    (dispatch [:initialize-data])
+                    (dispatch [:initialize-player]))))
