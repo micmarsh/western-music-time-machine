@@ -221,7 +221,8 @@ map.initialize = function () {
             };
         };
 
-//        resizeMap(r);
+        map.paper = r;
+        resizeMap(mapWidth, mapHeight);
     }
 
 
@@ -259,20 +260,21 @@ map.initialize = function () {
     }
     // Set-up to use getMouseXY function onMouseMove
     document.body.onmousemove = getMouseXY;
-    // function resizeMap(paper) {
-    //     paper.changeSize(mapWidth, mapHeight, true, false);
+    function resizeMap(mapWidth, mapHeight) {
+        map.paper.changeSize(mapWidth, mapHeight, true, false);
 
-    //     if (useSideText == 'true') {
-    //         $(".mapWrapper").css({
-    //             'width': (parseFloat(mapWidth, 10) + parseFloat(textAreaWidth, 10)) + 'px',
-    //             'height': mapHeight + 'px'
-    //         });
-    //     } else {
-    //         $(".mapWrapper").css({
-    //             'width': mapWidth + 'px',
-    //             'height': mapHeight + 'px'
-    //         });
-    //     }
-    // }
+        if (useSideText == 'true') {
+            $(".mapWrapper").css({
+                'width': (parseFloat(mapWidth, 10) + parseFloat(textAreaWidth, 10)) + 'px',
+                'height': mapHeight + 'px'
+            });
+        } else {
+            $(".mapWrapper").css({
+                'width': mapWidth + 'px',
+                'height': mapHeight + 'px'
+            });
+        }
+    }
+    window.map.resizeMap = resizeMap;
 };
 

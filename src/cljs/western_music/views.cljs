@@ -11,6 +11,8 @@
          #(dispatch [:select-nation %])))
  2000)
 
+(def ^:const icons "material-icons")
+
 (defn composition-list
   []
   (let [tracks (subscribe [:selected-tracks])
@@ -22,13 +24,16 @@
          (for' [track @tracks
                 :let [id (p/id track)]]
            [:li {:key id}
-            [:div (p/display track)
-             [:button
-              {:on-click #(dispatch [:play-track id])}
-              "PLAY"]
-             [:button
-              {:on-click #(dispatch [:enqueue-track id])}
-              "ENQUEUE"]]])]))))
+            [:div 
+             [:i
+              {:on-click #(dispatch [:play-track id])
+               :class icons}
+              "play_arrow"]
+             [:i
+              {:on-click #(dispatch [:enqueue-track id])
+               :class icons}
+              "queue_music"]
+             (p/display track)]])]))))
 
 (defn composer-list
   []
@@ -62,31 +67,32 @@
   (let [queue (subscribe [:track-queue])
         current-track (subscribe [:current-track])]
     (fn []
-      [:div
+      [:div#play-queue
        "Play Queue"
-       [:button {:on-click #(dispatch [:clear-queue])} "X"]
+       [:i {:on-click #(dispatch [:clear-queue]) :class icons} "clear"]
        [:ul
         (for' [track @queue
                :let [id (p/id track)]]
           [:li {:key id}
-           [:div (p/display track)
+           [:div 
             (when-not (= id (p/id @current-track))
-              [:button {:on-click #(dispatch [:play-track id])}
-               "PLAY"])
-            [:button
-             {:on-click #(dispatch [:dequeue-track id])}
-             "X"]]])]])))
+              [:i {:on-click #(dispatch [:play-track id]) :class icons} "play_arrow"])
+            [:i
+             {:on-click #(dispatch [:dequeue-track id])
+              :class icons}
+             "clear"]
+            (p/display track)]])]])))
 
 (defn player-controls
   []
   (let [paused? (subscribe [:paused?])]
     (fn []
       [:div
-       [:button {:on-click #(dispatch [:player-back])} "Back"]
+       [:i {:on-click #(dispatch [:player-back]) :class icons} "skip_previous"]
        (if @paused?
-         [:button {:on-click #(dispatch [:player-play])} "Play"]
-         [:button {:on-click #(dispatch [:player-pause])} "Pause"])
-       [:button {:on-click #(dispatch [:player-forward])} "Forward"]])))
+         [:i {:on-click #(dispatch [:player-play]) :class icons} "play_arrow"]
+         [:i {:on-click #(dispatch [:player-pause]) :class icons} "pause"])
+       [:i {:on-click #(dispatch [:player-forward]) :class icons} "skip_next"]])))
 
 (defn wmtm-app []
   [:div#app-body

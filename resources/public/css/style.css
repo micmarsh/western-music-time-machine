@@ -39,6 +39,10 @@ nav ul {
     list-style:none;
 }
 
+li li, #play-queue li {
+    list-style-type: none;
+}
+
 blockquote, q {
     quotes:none;
 }
