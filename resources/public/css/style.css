@@ -6,38 +6,38 @@ Author: Richard Clark - http://richclarkdesign.com
 Twitter: @rich_clark
 */
 
-html, body, div, span, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-abbr, address, cite, code,
-del, dfn, em, img, ins, kbd, q, samp,
-small, strong, sub, sup, var,
-b, i,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, figcaption, figure, 
-footer, header, hgroup, menu, nav, section, summary,
-time, mark, audio, video {
-    margin:0;
-    border:0;
-    outline:0;
-    font-size:100%;
-    vertical-align:baseline;
-    background:transparent;
-}
+/* html, body, div, span, object, iframe, */
+/* h1, h2, h3, h4, h5, h6, p, blockquote, pre, */
+/* abbr, address, cite, code, */
+/* del, dfn, em, img, ins, kbd, q, samp, */
+/* small, strong, sub, sup, var, */
+/* b, i, */
+/* dl, dt, dd, ol, ul, li, */
+/* fieldset, form, label, legend, */
+/* table, caption, tbody, tfoot, thead, tr, th, td, */
+/* article, aside, canvas, details, figcaption, figure,  */
+/* footer, header, hgroup, menu, nav, section, summary, */
+/* time, mark, audio, video { */
+/*     margin:0; */
+/*     border:0; */
+/*     outline:0; */
+/*     font-size:100%; */
+/*     vertical-align:baseline; */
+/*     background:transparent; */
+/* } */
 
-body {
-    line-height:1;
-}
+/* body { */
+/*     line-height:1; */
+/* } */
 
-article,aside,details,figcaption,figure,
-footer,header,hgroup,menu,nav,section { 
-    display:block;
-}
+/* article,aside,details,figcaption,figure, */
+/* footer,header,hgroup,menu,nav,section {  */
+/*     display:block; */
+/* } */
 
-nav ul {
-    list-style:none;
-}
+/* nav ul { */
+/*     list-style:none; */
+/* } */
 
 li li, #play-queue li {
     list-style-type: none;
@@ -137,9 +137,14 @@ input, select {
 
 body {
 font-family: Helvetica, Arial , sans-serif;
-background:#f2f2f2;
 font-size:12px;
 line-height:16px;
+
+background:url(../img/background-fade.jpg); //#f2f2f2;
+background-repeat:no-repeat;
+background-attachment:fixed;
+background-size:100% 100%;
+background-min-width: 900px;
 }
 
 #app {
@@ -211,5 +216,47 @@ padding-top: 2px;
 margin-left: 30px;
 }
 
+/* Tabs Stuff*/
 
+div #tabs {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-wrap: wrap;
+    flex-wrap: wrap;
+}
 
+div #tabs label {
+    background: #eee; 
+    border: 1px solid #ddd; 
+    padding: .7em 1em;
+    cursor: pointer;
+    z-index: 1;
+    margin-left: -1px;
+}
+
+div #tabs label:first-of-type {
+    margin-left: 0;
+}
+
+div #tabs div {
+    width: 100%;
+    margin-top: -1px;
+    padding: 1em;
+    border: 1px solid #ddd;
+    -webkit-order: 1;
+    order: 1;
+}
+
+div #tabs input[type=radio],
+div #tabs div {
+  display: none;
+}
+
+div #tabs input[type=radio]:checked + label {
+    background: #fff;
+    border-bottom: 1px solid #fff;
+}
+
+div #tabs input[type=radio]:checked + label + div {
+    display: block;
+}

@@ -27,6 +27,9 @@
          (distinct)
          (sort))))
 
+(defn ->already-queued? [queue]
+  (comp (set (map :track/id queue)) :track/id))
+
 (def-sub
   :selected-composers
   :<- [:selected-nation]
@@ -56,7 +59,7 @@
   :<- [:ui-state]
   (fn [ui _] 
     (let [queue (ui/player-queue (ui/player ui))
-          already-queued? (comp (set (map :track/id queue)) :track/id)]
+          already-queued? (->already-queued? queue)]
       (into [] (comp (remove already-queued?)
                      (map display-track-no-composer))
             (ui/track-list ui)))))

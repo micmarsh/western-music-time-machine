@@ -40,7 +40,7 @@
   (let [composers (subscribe [:selected-composers])
         nation (subscribe [:selected-nation])]
     (fn []
-      [:div
+      [:div ; "Selection"
        [:ul (p/display @nation)
         (for' [composer @composers
                :let [id (p/id composer)]]
@@ -68,8 +68,8 @@
         current-track (subscribe [:current-track])]
     (fn []
       [:div#play-queue
-       "Play Queue"
-       [:i {:on-click #(dispatch [:clear-queue]) :class icons} "clear"]
+;       "Play Queue"
+;       [:i {:on-click #(dispatch [:clear-queue]) :class icons} "clear"]
        [:ul
         (for' [track @queue
                :let [id (p/id track)]]
@@ -94,6 +94,22 @@
          [:i {:on-click #(dispatch [:player-pause]) :class icons} "pause"])
        [:i {:on-click #(dispatch [:player-forward]) :class icons} "skip_next"]])))
 
+(defn track-tabs []
+  (fn []
+    [:div#tabs
+     [:input {:id "selection-tab"
+              :type "radio"
+              :name "grp"
+              :checked "checked"
+              :on-change identity}]
+     [:label {:for "selection-tab"} "Selection"]
+     [:div.tab [composer-list]]
+     [:input {:id "queue-tab"
+              :type "radio"
+              :name "grp"}]
+     [:label {:for "queue-tab"} "Play Queue"]
+     [:div.tab [track-queue]]]))
+
 (defn wmtm-app []
   [:div#app-body
    [:div#map-container
@@ -103,5 +119,4 @@
    [:div#non-map
     [:div#youtube-player]    
     [player-controls]
-    [composer-list]
-    [track-queue]]])
+    [track-tabs]]])
