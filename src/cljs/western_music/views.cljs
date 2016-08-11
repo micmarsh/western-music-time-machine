@@ -5,6 +5,17 @@
 
 (def ^:const icons "material-icons")
 
+(defn icon
+  ([on-click type] (icon {} on-click type))
+  ([options on-click type]
+   (let [class (if (:class options)
+                 (str icons " " (:class options))
+                 icons)]
+     [:i (assoc options
+                :on-click on-click
+                :class class)
+      type])))
+
 (defn composition-list
   []
   (let [tracks (subscribe [:selected-tracks])
@@ -17,14 +28,8 @@
                 :on-click (if (empty? @queue)
                             #(dispatch [:play-track id])
                             #(dispatch [:enqueue-track id]))}
-          [:i
-           {:on-click #(dispatch [:play-track id])
-            :class icons}
-           "play_arrow"]
-          [:i
-           {:on-click #(dispatch [:enqueue-track id])
-            :class icons}
-           "queue_music"]
+          (icon #(dispatch [:play-track id]) "play_arrow")
+          (icon #(dispatch [:enqueue-track id]) "queue_music")
           (p/display track)])])))
 
 (defn composer-list
@@ -68,11 +73,8 @@
               :let [id (p/id track)]]
          [:div {:key id}
           (when-not (= id (p/id @current-track))
-            [:i {:on-click #(dispatch [:play-track id]) :class icons} "play_arrow"])
-          [:i
-           {:on-click #(dispatch [:dequeue-track id])
-            :class icons}
-           "clear"]
+            (icon #(dispatch [:play-track id]) "play_arrow"))
+          (icon #(dispatch [:dequeue-track id]) "clear")
           (p/display track)])])))
 
 (defn player-controls
@@ -80,11 +82,11 @@
   (let [paused? (subscribe [:paused?])]
     (fn []
       [:div
-       [:i {:on-click #(dispatch [:player-back]) :class icons} "skip_previous"]
+       (icon #(dispatch [:player-back]) "skip_previous")
        (if @paused?
-         [:i {:on-click #(dispatch [:player-play]) :class icons} "play_arrow"]
-         [:i {:on-click #(dispatch [:player-pause]) :class icons} "pause"])
-       [:i {:on-click #(dispatch [:player-forward]) :class icons} "skip_next"]])))
+         (icon #(dispatch [:player-play]) "play_arrow")
+         (icon #(dispatch [:player-pause]) "pause"))
+       (icon #(dispatch [:player-forward]) "skip_next")])))
 
 (defn track-tabs []
   (let [q (subscribe [:track-queue])]
