@@ -217,7 +217,6 @@ margin-left: 30px;
 }
 
 /* Tabs Stuff*/
-
 div #tabs {
     display: -webkit-flex;
     display: flex;
@@ -238,7 +237,7 @@ div #tabs label:first-of-type {
     margin-left: 0;
 }
 
-div #tabs div {
+.tab {
     width: 100%;
     margin-top: -1px;
     padding: 1em;
@@ -248,7 +247,7 @@ div #tabs div {
 }
 
 div #tabs input[type=radio],
-div #tabs div {
+.tab {
   display: none;
 }
 

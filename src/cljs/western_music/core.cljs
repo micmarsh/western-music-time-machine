@@ -9,6 +9,7 @@
   []
   (reagent/render [wmtm-app] (.getElementById js/document "app")
                   (fn []
+                    (.click (js/$ "#selection-tab"))
                     (.initialize js/map)
                     (dispatch [:initialize-data])
                     (dispatch [:initialize-player]))))

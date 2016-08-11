@@ -97,16 +97,10 @@
 (defn track-tabs []
   (fn []
     [:div#tabs
-     [:input {:id "selection-tab"
-              :type "radio"
-              :name "grp"
-              :checked "checked"
-              :on-change identity}]
+     [:input#selection-tab {:type "radio" :name "grp"}]
      [:label {:for "selection-tab"} "Selection"]
      [:div.tab [composer-list]]
-     [:input {:id "queue-tab"
-              :type "radio"
-              :name "grp"}]
+     [:input#queue-tab {:type "radio" :name "grp"}]
      [:label {:for "queue-tab"} "Play Queue"]
      [:div.tab [track-queue]]]))
 
