@@ -164,7 +164,6 @@ a img {
 border:none;
 }
 
-h1, h2, h3, h4, h5, h6{ margin-bottom:10px; font-weight:normal; }
 h1{ font-size:26px; line-height:32px; font-family: 'DroidSansRegular', Helvetica, Arial , sans-serif; }
 p, ul{margin-bottom:10px;}
 
@@ -237,7 +236,7 @@ div #tabs label:first-of-type {
 .tab-content {
     width: 100%;
     margin-top: -1px;
-    padding: 1em;
+    padding: 7px;
     border: 1px solid #ddd;
     -webkit-order: 1;
     order: 1;
@@ -257,4 +256,5 @@ div #tabs input[type=radio]:checked + label {
 
 div #tabs input[type=radio]:checked + label + div {
     display: block;
+    background: #fff;
 }

@@ -3,24 +3,20 @@
             [western-music.protocols :as p])
   (:require-macros [western-music.util :refer [for']]))
 
-(js/setTimeout
- (fn []
-   (set! (.-onNationFocus (.-listeners js/map))
-         #(dispatch [:focus-nation %]))
-   (set! (.-onNationClick (.-listeners js/map))
-         #(dispatch [:select-nation %])))
- 2000)
-
 (def ^:const icons "material-icons")
 
 (defn composition-list
   []
-  (let [tracks (subscribe [:selected-tracks])]
+  (let [tracks (subscribe [:selected-tracks])
+        queue (subscribe [:track-queue])]
     (fn []
       [:div#composer-tracks
        (for' [track @tracks
               :let [id (p/id track)]]
-         [:div {:key id}
+         [:div {:key id
+                :on-click (if (empty? @queue)
+                            #(dispatch [:play-track id])
+                            #(dispatch [:enqueue-track id]))}
           [:i
            {:on-click #(dispatch [:play-track id])
             :class icons}
@@ -38,7 +34,7 @@
         nation (subscribe [:selected-nation])]
     (fn []
       [:div#selection-list
-       (p/display @nation)
+       [:h2 (p/display @nation)]
        (for' [composer @composers
               :let [id (p/id composer)]]
          [:div {:key id :on-click #(dispatch [:select-composer id])}
