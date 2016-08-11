@@ -39,9 +39,6 @@ Twitter: @rich_clark
 /*     list-style:none; */
 /* } */
 
-li li, #play-queue li {
-    list-style-type: none;
-}
 
 blockquote, q {
     quotes:none;
@@ -237,17 +234,19 @@ div #tabs label:first-of-type {
     margin-left: 0;
 }
 
-.tab {
+.tab-content {
     width: 100%;
     margin-top: -1px;
     padding: 1em;
     border: 1px solid #ddd;
     -webkit-order: 1;
     order: 1;
+    font-size:18px;
+    
 }
 
 div #tabs input[type=radio],
-.tab {
+.tab-content {
   display: none;
 }
 
