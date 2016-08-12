@@ -2,13 +2,13 @@
   (:require [re-frame.core :refer [subscribe dispatch]]
             [western-music.protocols :as p]))
 
-(def interpose' (comp doall interpose))
-
 (def ^:const icons "material-icons")
 
-(def ^:const divider [:div.list-divider])
+(defn ->divider []
+  [:div.list-divider {:key (gensym)}])
 
-(def with-dividers (partial interpose' divider))
+(defn with-dividers [s]
+  (doall (drop 1 (interleave (repeatedly ->divider) s))))
 
 (defn icon
   ([on-click type] (icon {} on-click type))
@@ -46,7 +46,8 @@
         nation (subscribe [:selected-nation])]
     (fn []
       [:div#selection-list
-       (when-not (nil? @nation)
+       (if (nil? @nation)
+         [:h3 "(select a nation from the map)"]
          [:h2 (p/display @nation)])
        (with-dividers
          (for [composer @composers
@@ -89,7 +90,7 @@
   []
   (let [paused? (subscribe [:paused?])]
     (fn []
-      [:div
+      [:div#player-controls
        (icon #(dispatch [:player-back]) "skip_previous")
        (if @paused?
          (icon #(dispatch [:player-play]) "play_arrow")

@@ -31,8 +31,8 @@
 
 (def player-options
   (clj->js
-   {:height "240"
-    :width "300"
+   {:height "350"
+    :width "480"
     :events {:onReady player-ready
              :onStateChange player-state-change}}))
 

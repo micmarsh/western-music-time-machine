@@ -157,7 +157,7 @@ background-min-width: 900px;
 }
 
 #non-map {
-    width:300px
+    max-width:480px;
 }
 
 a img {
@@ -281,4 +281,15 @@ div #tabs input[type=radio]:checked + label + div {
 
 .list-item-text {
     margin-left: 10px;
+}
+
+#player-controls {
+    display: flex;
+    justify-content: center;
+    background: #ccc;
+    margin-top: -5px;
+}
+
+#player-controls .material-icons {
+    font-size: 50px;
 }
