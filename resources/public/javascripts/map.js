@@ -162,7 +162,7 @@ map.initialize = function () {
                 
             });
             
-            obj.mouseup(function (e) {
+            obj.click(function (e) {
                 
                 //Reset scrollbar
                 var t = $('#text')[0];
@@ -183,8 +183,7 @@ map.initialize = function () {
                 
                 current = this; // `current` appears to be the
                 // equivalent of "selected" in the rest of your app
-                
-                fireEvent('onNationClick', stateNames[this.id])
+                fireEvent('onNationClick', stateNames[this.id]);
             });
             
         }
