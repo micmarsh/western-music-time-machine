@@ -264,3 +264,21 @@ div #tabs input[type=radio]:checked + label + div {
     flex-direction: row;
     align-items: center;
 }
+
+.list-divider {
+    border-bottom: 1px solid black;
+    margin: 5px 0px;
+}
+
+#composer-tracks .list-divider {
+    border-bottom: 1px solid #ddd;
+    margin: 5px 0px;
+}
+
+.material-icons {
+    font-size: 35px;
+}
+
+.list-item-text {
+    margin-left: 10px;
+}

@@ -1,9 +1,14 @@
 (ns western-music.views
   (:require [re-frame.core :refer [subscribe dispatch]]
-            [western-music.protocols :as p])
-  (:require-macros [western-music.util :refer [for']]))
+            [western-music.protocols :as p]))
+
+(def interpose' (comp doall interpose))
 
 (def ^:const icons "material-icons")
+
+(def ^:const divider [:div.list-divider])
+
+(def with-dividers (partial interpose' divider))
 
 (defn icon
   ([on-click type] (icon {} on-click type))
@@ -22,15 +27,17 @@
         queue (subscribe [:track-queue])]
     (fn []
       [:div#composer-tracks
-       (for' [track @tracks
-              :let [id (p/id track)]]
-         [:div.track-list-item {:key id}
-          (icon #(dispatch [:play-track id]) "play_arrow")
-          (icon #(dispatch [:enqueue-track id]) "queue_music")
-          [:div {:on-click (if (empty? @queue)
-                             #(dispatch [:play-track id])
-                             #(dispatch [:enqueue-track id]))}
-           (p/display track)]])])))
+       (with-dividers
+         (for [track @tracks
+                :let [id (p/id track)]]
+           [:div.track-list-item {:key id}
+            (icon #(dispatch [:play-track id]) "play_arrow")
+            (icon #(dispatch [:enqueue-track id]) "queue_music")
+            [:div.list-item-text
+             {:on-click (if (empty? @queue)
+                          #(dispatch [:play-track id])
+                          #(dispatch [:enqueue-track id]))}
+             (p/display track)]]))])))
 
 (defn composer-list
   []
@@ -41,12 +48,13 @@
       [:div#selection-list
        (when-not (nil? @nation)
          [:h2 (p/display @nation)])
-       (for' [composer @composers
-              :let [id (p/id composer)]]
-         [:div {:key id :on-click #(dispatch [:select-composer id])}
-          (p/display composer)
-          (when (= id (p/id @selected-composer))
-            [composition-list])])])))
+       (with-dividers
+         (for [composer @composers
+               :let [id (p/id composer)]]
+           [:div {:key id :on-click #(dispatch [:select-composer id])}
+            (p/display composer)
+            (when (= id (p/id @selected-composer))
+              [composition-list])]))])))
 
 (defn track-composer
   "SUPER BIG HACK separating notion of display value and internal ref id
@@ -68,15 +76,14 @@
         current-track (subscribe [:current-track])]
     (fn []
       [:div#play-queue
-;       "Play Queue"
-;       [:i {:on-click #(dispatch [:clear-queue]) :class icons} "clear"]
-       (for' [track @queue
-              :let [id (p/id track)]]
-         [:div {:key id}
-          (when-not (= id (p/id @current-track))
-            (icon #(dispatch [:play-track id]) "play_arrow"))
-          (icon #(dispatch [:dequeue-track id]) "clear")
-          (p/display track)])])))
+       (with-dividers
+         (for [track @queue
+                :let [id (p/id track)]]
+           [:div.track-list-item {:key id}
+            (when-not (= id (p/id @current-track))
+              (icon #(dispatch [:play-track id]) "play_arrow"))
+            (icon #(dispatch [:dequeue-track id]) "clear")
+            (p/display track)]))])))
 
 (defn player-controls
   []
