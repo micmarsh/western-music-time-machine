@@ -240,7 +240,7 @@ div #tabs label:first-of-type {
     border: 1px solid #ddd;
     -webkit-order: 1;
     order: 1;
-    font-size:18px;
+    font-size:16px;
     
 }
 
@@ -257,4 +257,10 @@ div #tabs input[type=radio]:checked + label {
 div #tabs input[type=radio]:checked + label + div {
     display: block;
     background: #fff;
+}
+
+.track-list-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
 }

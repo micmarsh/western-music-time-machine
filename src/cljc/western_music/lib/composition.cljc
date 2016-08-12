@@ -1,6 +1,7 @@
 (ns western-music.lib.composition
   (:refer-clojure :exclude [name])
   (:require [western-music.spec :as spec]
+            [western-music.util :as util]
             [clojure.spec :as s]))
 
 (defn nation-id [composition]
@@ -34,3 +35,7 @@
 
 (defn add-track [composition track]
   (update composition :composition/tracks (fnil conj []) track))
+
+(defn ->nation? [id]
+  (comp (partial util/string= id) nation-id))
+

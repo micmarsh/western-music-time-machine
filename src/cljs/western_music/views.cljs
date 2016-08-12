@@ -24,13 +24,13 @@
       [:div#composer-tracks
        (for' [track @tracks
               :let [id (p/id track)]]
-         [:div {:key id
-                :on-click (if (empty? @queue)
-                            #(dispatch [:play-track id])
-                            #(dispatch [:enqueue-track id]))}
+         [:div.track-list-item {:key id}
           (icon #(dispatch [:play-track id]) "play_arrow")
           (icon #(dispatch [:enqueue-track id]) "queue_music")
-          (p/display track)])])))
+          [:div {:on-click (if (empty? @queue)
+                             #(dispatch [:play-track id])
+                             #(dispatch [:enqueue-track id]))}
+           (p/display track)]])])))
 
 (defn composer-list
   []
@@ -39,7 +39,8 @@
         nation (subscribe [:selected-nation])]
     (fn []
       [:div#selection-list
-       [:h2 (p/display @nation)]
+       (when-not (nil? @nation)
+         [:h2 (p/display @nation)])
        (for' [composer @composers
               :let [id (p/id composer)]]
          [:div {:key id :on-click #(dispatch [:select-composer id])}

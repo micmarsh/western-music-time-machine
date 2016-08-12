@@ -34,12 +34,14 @@
   :selected-composers
   :<- [:selected-nation]
   :<- [:raw-data]
-  (fn [[nation data] _]
-    (->> data
-         (filter (comp (partial util/string= nation) composition/nation-id))
-         (map composition/composer-name)
-         (distinct)
-         (sort))))
+  :<- [:player]
+  (fn [[nation data p] _]
+    (let [already-queued? (->already-queued? (ui/player-queue p))]
+     (sort (into [] (comp (filter (composition/->nation? nation))
+                          (remove (comp already-queued? composition/track))
+                          (map composition/composer-name)
+                          (distinct))
+                 data)))))
 
 (def-sub
   :selected-composer
