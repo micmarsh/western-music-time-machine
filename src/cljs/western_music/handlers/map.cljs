@@ -4,5 +4,7 @@
 (def-event
   :nation-ready
   (fn [data [_ nation]]
-    (.activateNation (.-input js/map) nation)
+    (let [map (.-input js/map)]
+      (when-not (.isActivated map nation)
+        (.activateNation map nation)))
     data))
