@@ -9,7 +9,8 @@
   (set! (.-onNationFocus (.-listeners js/map))
         #(dispatch [:focus-nation %]))
   (set! (.-onNationClick (.-listeners js/map))
-        #(dispatch [:select-nation %])))
+        #(dispatch [:select-nation %]))
+  (set! (.-onNationBlur (.-listeners js/map)) identity))
 
 (defn ^:export main
   []

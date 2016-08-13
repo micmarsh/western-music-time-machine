@@ -13,6 +13,12 @@
   ui/verify-all-data
   (ui/->initialize initial-data))
 
+(def-event
+  :new-composition-data
+  (path :data/raw)
+  (fn [raw-data [_ composition]]
+    (ui/new-composition raw-data composition)))
+
 (defn set-value-handler [_ [_ value]] value)
 
 (def-event

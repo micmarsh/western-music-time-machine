@@ -5,9 +5,9 @@ window.map = {};
         throw new Error("Map not initialized yet! Use `window.map.initialize()`");
     }    
     window.map.listeners = {
-        onNationFocus: initializeError,
-        onNationBlur: initializeError,
-        onNationClick: initializeError
+        onNationFocus: null, 
+        onNationBlur: null,
+        onNationClick: null
     }
     window.map.input = {
         activateNation: initializeError,

@@ -57,10 +57,14 @@
 
 (defn ->initialize [initial-data]
   (fn [& _]
-    (doseq [nation (map composition/nation-id initial-data)]
-      (dispatch [:nation-ready nation]))
-    #:data{:raw initial-data
-           :ui blank}))
+    (doseq [composition initial-data]
+      (dispatch [:new-composition-data composition])
+      (dispatch [:nation-ready (composition/nation-id composition)]))
+    #:data{:raw [] :ui blank}))
+
+(defn new-composition
+  [raw-data composition]
+  (conj (or raw-data []) composition))
 
 (defn track-list-by-composer
   [{compositions :data/raw :as all-data} composer]
