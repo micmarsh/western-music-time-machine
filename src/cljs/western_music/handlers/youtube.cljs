@@ -2,6 +2,8 @@
   (:require [re-frame.core :refer [def-event dispatch]]
             [western-music.lib.ui :as ui]))
 
+(enable-console-print!)
+
 (def player)
 
 (defn player-ready []

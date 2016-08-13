@@ -8,8 +8,9 @@ lein with-profile compile-client do clean,  cljsbuild once
 
 mkdir javascripts js css img xml
 
-cp resources/public/js/* js/
+
 cp resources/public/img/* img/
+cp resources/public/js/client.js js/client.js
 cp resources/public/xml/settings.xml xml/settings.xml
 cp resources/public/index.html index.html
 
