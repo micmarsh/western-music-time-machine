@@ -10,11 +10,10 @@ mkdir javascripts js css img xml
 
 cp resources/public/js/* js/
 cp resources/public/img/* img/
-cp resources/public/xml/settings.xml img/settings.xml
+cp resources/public/xml/settings.xml xml/settings.xml
 cp resources/public/index.html index.html
 
 sed -i '/<script src="javascripts\/utils.js"><\/script>/d' index.html
-
 
 minify resources/public/javascripts/utils.js resources/public/javascripts/map.js -o javascripts/map.js 
 minify resources/public/css/style.css -o css/style.css
