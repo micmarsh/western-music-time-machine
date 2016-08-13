@@ -20,12 +20,18 @@
                    :cljsbuild {:builds {:client {:source-paths ["devsrc"]
                                                  :compiler     {:main "western-music.dev"
                                                                 :asset-path "js"
-                                                                :externs ["externjs/YOOOOOOOOOOO.js"]
                                                                 :optimizations :none
                                                                 :source-map true
                                                                 :source-map-timestamp true}}}}
                    
-                   :aliases {"initial-ingest" ["run" "-m" "western-music.ingest.run/initial-ingest"]}}}
+                   :aliases {"initial-ingest" ["run" "-m" "western-music.ingest.run/initial-ingest"]}}
+             
+             :compile-client {:dependencies [[org.clojure/clojurescript "0.0-MERGE-FIX"]
+                                             [re-frame "0.8.0-alpha2"]]
+                              :cljsbuild {:builds {:client {:compiler {:main "western-music.core"
+                                                                       :asset-path "js"
+                                                                       :externs ["resources/public/externs.js"]
+                                                                       :optimizations :advanced}}}}}}
 
   
   :figwheel {:server-port 3450

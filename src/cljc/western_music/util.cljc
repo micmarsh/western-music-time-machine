@@ -14,12 +14,10 @@
      (fn [v] (if (pred? v) (f v) v))
      data)))
 
-#?(:cljs
-   (defn string= [& strings]
-     (->> strings
-          (map #(str (js/String. %)))
-          (apply =)))
-   )
+(defn string= [& strings]
+ (->> strings
+      (map #?(:cljs #(str (js/String. %)) :clj identity))
+      (apply =)))
 
 (def ^:dynamic *global-cache* nil)
 
