@@ -1,17 +1,38 @@
 (ns western-music.handlers
-  (:require [western-music.data :refer [initial-data]]
-            [re-frame.core :refer [def-event path after debug dispatch]]
+  (:require [re-frame.core :refer [def-event path after debug dispatch]]
+            [western-music.lib.composition :as composition]
             [western-music.spec :as spec]
             [western-music.lib.ui :as ui]
             [clojure.spec :as s]
+            [ajax.core :refer [GET]]
+            [ajax.edn :as edn]
             ;; implemenation-specific handlers
             [western-music.handlers.youtube]
             [western-music.handlers.map]))
 
+(defn key-tag-parser [key]
+  (fn [m]
+    (into { }
+          (for [[k v] m]
+            [(if (namespace k)
+               k
+               (keyword (name key) (name k)))
+             v]))))
+
+(doseq [[key parser] (map (juxt identity key-tag-parser) [:track :composer :composition :western-music.spec])]
+  (cljs.reader/register-tag-parser! key parser))
+
 (def-event
   :initialize-data
   ui/verify-all-data
-  (ui/->initialize initial-data))
+  (fn [data _]
+    (GET "/edn/compositions.edn"
+         {:handler (fn [initial-data]
+                     (doseq [composition initial-data]
+                       (dispatch [:new-composition-data composition])
+                       (dispatch [:nation-ready (composition/nation-id composition)])))
+          :response-format (edn/edn-response-format)})
+    ui/initial-data))
 
 (def-event
   :new-composition-data

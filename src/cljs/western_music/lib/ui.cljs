@@ -55,12 +55,8 @@
                            :selected nil}
        :composer nil})
 
-(defn ->initialize [initial-data]
-  (fn [& _]
-    (doseq [composition initial-data]
-      (dispatch [:new-composition-data composition])
-      (dispatch [:nation-ready (composition/nation-id composition)]))
-    #:data{:raw [] :ui blank}))
+(def ^:const initial-data
+  #:data{:raw [] :ui blank})
 
 (defn new-composition
   [raw-data composition]
