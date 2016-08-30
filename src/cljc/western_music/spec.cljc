@@ -91,6 +91,12 @@
 
 (s/def :composition/tracks ::track-list)
 
+(defn verify [spec item]
+  (if (s/valid? spec item)
+    item
+    (throw (ex-info (str "spec check failed: " (s/explain-str spec item))
+                    (s/explain-data spec item)))))
+
 (comment
   (s/explain ::composition 
              {:composition/name "Teh 5th" 

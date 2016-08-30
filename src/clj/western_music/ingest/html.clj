@@ -39,12 +39,15 @@
   (keyword (gensym)))
 
 (def initial-composition-spec
-  {:name (comp title->composition-name
-               arbitrary-placeholder)
-   :composer {:name (comp title->composer-name
-                          arbitrary-placeholder)}})
+  {:composition/name (comp title->composition-name
+                           arbitrary-placeholder)
+   :western-music.spec/composer #:composer{:name (comp title->composer-name
+                                                      arbitrary-placeholder)}})
 
-(defn parse-title [title]
+(defn parse-title
+  "Creates initial data based on a string of format
+    X. Composer Name - Track Name "
+  [title]
   (-> {arbitrary-placeholder title}
       (apply-spec initial-composition-spec)
       (select-keys (keys initial-composition-spec))))

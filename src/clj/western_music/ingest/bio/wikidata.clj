@@ -129,29 +129,31 @@
                   {:raw-prop prop
                    :value (value prop)})))
 
+(defn composer-name [data]
+  (:composer/name (:western-music.spec/composer data)))
+
 ;; Functions exposed to rest of application
-(defn lookup-year [data]
-  (let [who (:name (:composer data))]
-    (->> (id-search who)
-         (properties-query)
-         (property :date-of-birth)
-         (t/year))))
+(defn lookup-year [data]  
+  (->> data
+       (composer-name)
+       (id-search)
+       (properties-query)
+       (property :date-of-birth)
+       (t/year)))
 
 (defn lookup-city [data]
-  (let [who (:name (:composer data))]
-    (->> (id-search who)
-         (properties-query)
-         (property :place-of-birth)
-         (property :title))))
+  (->> data
+       (composer-name)
+       (id-search)
+       (properties-query)
+       (property :place-of-birth)
+       (property :title)))
 
 (defn lookup-nation [data]
-  (let [who (:name (:composer data))]
-    (->> (id-search who)
-         (properties-query)
-         (property :place-of-birth)
-         (property :country)
-         (property :title))))
-
-(comment
-  (lookup-year {:composer {:name "Franz Liszt"}})
-  )
+  (->> data
+       (composer-name)
+       (id-search)
+       (properties-query)
+       (property :place-of-birth)
+       (property :country)
+       (property :title)))
