@@ -10,18 +10,6 @@
             [western-music.handlers.youtube]
             [western-music.handlers.map]))
 
-(defn key-tag-parser [key]
-  (fn [m]
-    (into { }
-          (for [[k v] m]
-            [(if (namespace k)
-               k
-               (keyword (name key) (name k)))
-             v]))))
-
-(doseq [[key parser] (map (juxt identity key-tag-parser) [:track :composer :composition :western-music.spec])]
-  (cljs.reader/register-tag-parser! key parser))
-
 (def-event
   :initialize-data
   ui/verify-all-data

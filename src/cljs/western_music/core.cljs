@@ -2,6 +2,7 @@
   (:require [western-music.views :refer [wmtm-app]]
             [western-music.handlers]
             [western-music.subscriptions]
+            [western-music.edn :as edn]
             [re-frame.core :refer [dispatch dispatch-sync]]
             [reagent.core :as reagent]))
 
@@ -14,6 +15,7 @@
 
 (defn ^:export main
   []
+  (edn/register-custom-readers!)
   (reagent/render [wmtm-app] (.getElementById js/document "app")
                   (fn []
                     (set-map-listeners!)
