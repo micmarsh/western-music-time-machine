@@ -5,7 +5,8 @@
             [western-music.ingest.fetch :refer [apply-spec]]
             [western-music.ingest.youtube.search :as yt]
             [western-music.lib.composition :as comp]
-            [western-music.spec :as spec]))
+            [western-music.spec :as spec]
+            [clojure.spec :as s]))
 
 (def formatted-title (partial format ". %s - %s"))
 
@@ -38,7 +39,7 @@
 
 (defn add-new-composition
   [existing yt-api-key artist composition-name]
-  (spec/verify [::spec/composition] existing)
+  (spec/verify (s/coll-of ::spec/composition) existing)
   (let [options {:yt-api-key yt-api-key
                  :new-composition-id (inc (comp/max-id existing))
                  :new-track-id (inc (comp/max-track-id existing))}]
