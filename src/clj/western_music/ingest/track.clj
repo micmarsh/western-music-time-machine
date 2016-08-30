@@ -7,8 +7,7 @@
             [western-music.lib.composition :as comp]
             [western-music.spec :as spec]))
 
-(def formatted-title
-  (partial format "X. %s - %s"))
+(def formatted-title (partial format ". %s - %s"))
 
 (def ^:const bio-fetch-spec
   {::spec/composer #:composer{:birth bio/fetch-spec}})
@@ -34,5 +33,24 @@
                                              #:track{:artist artist
                                                      :title composition-name})))
        (#(assoc % :composition/id new-composition-id))
-       (spec/verify ::spec/composition) ))
+       (spec/verify ::spec/composition)))
 
+
+(defn add-new-composition
+  [existing yt-api-key artist composition-name]
+  (spec/verify [::spec/composition] existing)
+  (let [options {:yt-api-key yt-api-key
+                 :new-composition-id (inc (comp/max-id existing))
+                 :new-track-id (inc (comp/max-track-id existing))}]
+    (conj existing (full-composition options artist composition-name))))
+
+(comment
+  (require '[clojure.edn :as edn])
+
+  (def ^:const compositions-path "resources/public/edn/compositions.edn")
+  
+  (defn add-track [yt-api-key artist title]
+    (let [existing-data (edn/read-string (slurp compositions-path))
+          new-data (add-new-composition existing-data yt-api-key artist title)]
+      (spit compositions-path (pr-str new-data))))  
+  )

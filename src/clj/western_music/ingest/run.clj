@@ -12,6 +12,10 @@
   ["-f" "--file FILE" "Output file location"
    :validate [#(.endsWith % ".edn") "Should be an edn file"]])
 
+(def ^:const input-file
+  ["-i" "--input FILE" "Input file location"
+   :validate [#(.endsWith % ".edn") "Should be an edn file"]])
+
 (def ingest-url (comp html/initial-data html/fetch-url))
 
 (defn initial-ingest [& args]
