@@ -53,5 +53,5 @@
   (defn add-track [yt-api-key artist title]
     (let [existing-data (edn/read-string (slurp compositions-path))
           new-data (add-new-composition existing-data yt-api-key artist title)]
-      (spit compositions-path (pr-str new-data))))  
+      (spit compositions-path (pr-str new-data))))
   )
