@@ -39,3 +39,15 @@
 (defn ->nation? [id]
   (comp (partial util/string= id) nation-id))
 
+(defn max-id [compositions]
+  (assert (sequential? compositions))
+  (->> compositions
+       (map :composition/id)
+       (apply max)))
+
+(defn max-track-id [compositions]
+  (assert (sequential? compositions))
+  (->> compositions
+       (mapcat :composition/tracks)
+       (map :track/id)
+       (apply max)))

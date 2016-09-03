@@ -55,12 +55,12 @@
                            :selected nil}
        :composer nil})
 
-(defn ->initialize [initial-data]
-  (fn [& _]
-    (doseq [nation (map composition/nation-id initial-data)]
-      (dispatch [:nation-ready nation]))
-    #:data{:raw initial-data
-           :ui blank}))
+(def ^:const initial-data
+  #:data{:raw [] :ui blank})
+
+(defn new-composition
+  [raw-data composition]
+  (conj (or raw-data []) composition))
 
 (defn track-list-by-composer
   [{compositions :data/raw :as all-data} composer]

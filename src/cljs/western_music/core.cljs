@@ -2,6 +2,7 @@
   (:require [western-music.views :refer [wmtm-app]]
             [western-music.handlers]
             [western-music.subscriptions]
+            [western-music.edn :as edn]
             [re-frame.core :refer [dispatch dispatch-sync]]
             [reagent.core :as reagent]))
 
@@ -9,10 +10,12 @@
   (set! (.-onNationFocus (.-listeners js/map))
         #(dispatch [:focus-nation %]))
   (set! (.-onNationClick (.-listeners js/map))
-        #(dispatch [:select-nation %])))
+        #(dispatch [:select-nation %]))
+  (set! (.-onNationBlur (.-listeners js/map)) identity))
 
 (defn ^:export main
   []
+  (edn/register-custom-readers!)
   (reagent/render [wmtm-app] (.getElementById js/document "app")
                   (fn []
                     (set-map-listeners!)

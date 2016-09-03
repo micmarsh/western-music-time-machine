@@ -1,14 +1,20 @@
-window.map = {};   
-window.map.listeners = {
-    onNationFocus: null,
-    onNationBlur: null,
-    onNationClick: null
-}
-window.map.input = {
-    activateNation: function () {
+window.map = {};
+
+(function () {
+    function initializeError () {
         throw new Error("Map not initialized yet! Use `window.map.initialize()`");
+    }    
+    window.map.listeners = {
+        onNationFocus: null, 
+        onNationBlur: null,
+        onNationClick: null
     }
-}
+    window.map.input = {
+        activateNation: initializeError,
+        isActivated: initializeError
+    }
+})();
+
 map.initialize = function () {
     
     function fireEvent (listenerName, arg) {
@@ -128,6 +134,8 @@ map.initialize = function () {
             obj.attr({
                 fill: stateColors[obj.id]
             });
+
+            obj.active = true;
             
             obj.mouseover(function (e) {
                 
@@ -193,6 +201,7 @@ map.initialize = function () {
                 fill: offColor,
                 cursor: 'default'
             });
+            obj.active = false;
         }
         
         
@@ -219,6 +228,11 @@ map.initialize = function () {
                 console.log("No nation found for ", nationName)
             };
         };
+
+        map.input.isActivated = function isActivated (nationName) {
+            var obj = nationObjects[nationName];
+            return (!!obj && obj.active);
+        }
 
         map.paper = r;
         resizeMap(mapWidth, mapHeight);

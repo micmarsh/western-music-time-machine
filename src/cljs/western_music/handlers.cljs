@@ -1,17 +1,39 @@
 (ns western-music.handlers
-  (:require [western-music.data :refer [initial-data]]
-            [re-frame.core :refer [def-event path after debug dispatch]]
+  (:require [re-frame.core :refer [def-event path after debug dispatch]]
+            [western-music.lib.composition :as composition]
             [western-music.spec :as spec]
             [western-music.lib.ui :as ui]
             [clojure.spec :as s]
+            [ajax.core :refer [GET]]
+            [ajax.edn :as edn]
             ;; implemenation-specific handlers
             [western-music.handlers.youtube]
             [western-music.handlers.map]))
 
+(def current-seconds #(.getTime (js/Date.)))
+
+(defn cache-bust [url]
+  (->> (current-seconds)
+       (str "?&_=")
+       (str url)))
+
 (def-event
   :initialize-data
   ui/verify-all-data
-  (ui/->initialize initial-data))
+  (fn [data _]
+    (GET (cache-bust "/edn/compositions.edn")
+         {:handler (fn [initial-data]
+                     (doseq [composition initial-data]
+                       (dispatch [:new-composition-data composition])
+                       (dispatch [:nation-ready (composition/nation-id composition)])))
+          :response-format (edn/edn-response-format)})
+    ui/initial-data))
+
+(def-event
+  :new-composition-data
+  (path :data/raw)
+  (fn [raw-data [_ composition]]
+    (ui/new-composition raw-data composition)))
 
 (defn set-value-handler [_ [_ value]] value)
 

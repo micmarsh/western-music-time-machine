@@ -2,14 +2,16 @@
 
 # npm install -g minifier
 
-rm -r javascripts js css img xml
+
+rm -r javascripts js css img xml edn
 
 lein with-profile compile-client do clean,  cljsbuild once
 
-mkdir javascripts js css img xml
-
+mkdir javascripts js css img xml edn
 
 cp resources/public/img/* img/
+cp resources/public/edn/* edn/
+
 cp resources/public/js/client.js js/client.js
 cp resources/public/xml/settings.xml xml/settings.xml
 cp resources/public/index.html index.html

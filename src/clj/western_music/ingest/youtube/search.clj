@@ -22,18 +22,12 @@
 
 (def new-ids (atom 0))
 
-(defn youtube-track [api-key track]
+(defn youtube-track [api-key new-id track]
   (let [search-term (search-title track)]
     (-> track
         (assoc :track/type :track/youtube)
         (assoc :track/youtube-id (id (body (search api-key search-term))))
-        (assoc :track/id (+ 200 (swap! new-ids inc))))))
-
-(defn verify [spec item]
-  (if (s/valid? spec item)
-    item
-    (throw (ex-info (str "spec check failed: " (s/explain-str spec item))
-                    (s/explain-data spec item)))))
+        (assoc :track/id new-id))))
 
 (comment
   (require '[western-music.data :refer [initial-data]]
@@ -42,7 +36,7 @@
   (def with-youtube
     (map (fn [comp]
            (verify :western-music.spec/composition
-                   (comp/add-track comp (youtube-track API_KEY (comp/track comp)))))
+                   (comp/add-track comp (youtube-track API_KEY (+ 200 (swap! new-ids inc)) (comp/track comp)))))
          initial-data))
   
   )
