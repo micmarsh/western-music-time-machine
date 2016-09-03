@@ -21,7 +21,7 @@
   :initialize-data
   ui/verify-all-data
   (fn [data _]
-    (GET (cache-bust "/edn/compositions.edn")
+    (GET (cache-bust "edn/compositions.edn")
          {:handler (fn [initial-data]
                      (doseq [composition initial-data]
                        (dispatch [:new-composition-data composition])
