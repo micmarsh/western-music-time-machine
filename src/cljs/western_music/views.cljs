@@ -57,20 +57,6 @@
             (when (= id (p/id @selected-composer))
               [composition-list])]))])))
 
-(defn track-composer
-  "SUPER BIG HACK separating notion of display value and internal ref id
-   will go a long way towards fixing this"
-  [track]
-  (first (clojure.string/split track #" - ")))
-
-(defn track-composition
-  "SUPER BIG HACK separating notion of display value and internal ref id
-   will go a long way towards fixing this"
-  [track]
-  (->> (clojure.string/split track #" - ")
-       (rest)
-       (clojure.string/join " - ")))
-
 (defn track-queue
   []
   (let [queue (subscribe [:track-queue])
