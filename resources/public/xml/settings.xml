@@ -23,10 +23,6 @@ textAreaPadding = "10"
 <![CDATA[]]>
 </stateData>
 
-<stateData stateName="Tunisia"   initialStateColor= "339933" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
-<![CDATA[]]>
-</stateData>
-
 <stateData stateName="Faroe Islands"   initialStateColor= "B12401" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
 <![CDATA[]]>
 </stateData>
@@ -79,23 +75,7 @@ textAreaPadding = "10"
 <![CDATA[]]>
 </stateData>
 
-<stateData stateName="Palestine"   initialStateColor= "58798D" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
-<![CDATA[]]>
-</stateData>ta>
-
-<stateData stateName="Lebanon"   initialStateColor= "58798D" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
-<![CDATA[]]>
-</stateData>
-
 <stateData stateName="Georgia"   initialStateColor= "58798D" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
-<![CDATA[]]>
-</stateData>
-
-<stateData stateName="Lybia"   initialStateColor= "58798D" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
-<![CDATA[]]>
-</stateData>
-
-<stateData stateName="Maroc"   initialStateColor= "58798D" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
 <![CDATA[]]>
 </stateData>
 
@@ -135,14 +115,6 @@ textAreaPadding = "10"
 <![CDATA[]]>
 </stateData>
 
-<stateData stateName="Cyprus"   initialStateColor= "58798D" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
-<![CDATA[]]>
-</stateData>
-
-<stateData stateName="Turkey"   initialStateColor= "58798D" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
-<![CDATA[]]>
-</stateData>
-
 <stateData stateName="Austria"   initialStateColor= "E75480" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
 <![CDATA[]]>
 </stateData>
@@ -151,7 +123,7 @@ textAreaPadding = "10"
 <![CDATA[]]>
 </stateData>
 
-<stateData stateName="Denmark"   initialStateColor= "B12401" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
+<stateData stateName="Denmark"   initialStateColor= "58798D" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
 <![CDATA[]]>
 </stateData>
 
@@ -207,7 +179,7 @@ textAreaPadding = "10"
 <![CDATA[]]>
 </stateData>
 
-<stateData stateName="Ukraine"   initialStateColor= "58798D" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
+<stateData stateName="Ukraine"   initialStateColor= "339933" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
 <![CDATA[]]>
 </stateData>
 
@@ -236,31 +208,7 @@ textAreaPadding = "10"
 <![CDATA[]]>
 </stateData>
 
-<stateData stateName="Spain"   initialStateColor= "339933" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
-<![CDATA[]]>
-</stateData>
-
-<stateData stateName="Algeria"   initialStateColor= "E75480" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
-<![CDATA[]]>
-</stateData>
-
-<stateData stateName="Egypt"   initialStateColor= "B12401" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
-<![CDATA[]]>
-</stateData>
-
-<stateData stateName="Saudi Arabia"   initialStateColor= "B12401" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
-<![CDATA[]]>
-</stateData>
-
-<stateData stateName="Jordan"   initialStateColor= "339933" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
-<![CDATA[]]>
-</stateData>
-
-<stateData stateName="Syria"   initialStateColor= "B12401" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
-<![CDATA[]]>
-</stateData>
-
-<stateData stateName="Israel"   initialStateColor= "B12401" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
+<stateData stateName="Spain"   initialStateColor= "B12401" stateOverColor = "FF9900" stateSelectedColor = "feb41c">
 <![CDATA[]]>
 </stateData>
 
