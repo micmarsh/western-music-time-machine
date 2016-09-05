@@ -64,13 +64,14 @@
        (with-dividers
          (for [composer @composers
                :let [id (p/id composer)]]
-           [:div {:key id :on-click #(dispatch [:select-composer id])}
+           [:div {:key id}
             [:div.composer-header
-             (icon {:class "smaller-icons"} (constantly true)
+             (icon {:class "smaller-icons"} #(dispatch [:select-composer id])
                    (if (= id (p/id @selected-composer))
                      "expand_more"
                      "chevron_right"))
-             (p/display composer)
+             [:div {:on-click #(dispatch [:select-composer id])}
+              (p/display composer)]
              (if (empty? @queue)
                (icon #(dispatch [:play-composer (p/id composer)]) "play_arrow")
                (icon #(dispatch [:enqueue-composer (p/id composer)]) "queue_music"))]
