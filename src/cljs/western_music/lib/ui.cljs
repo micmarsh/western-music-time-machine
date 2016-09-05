@@ -81,6 +81,9 @@
 (defn set-composer [all-data composer]
   (assoc-in all-data [:data/ui :ui/composer] composer))
 
+(defn get-composer [all-data]
+  (get-in all-data [:data/ui :ui/composer]))
+
 (defn enqueue-track 
   "Enqueues a track that hasn't already been added to the given collection"
   [queue track]

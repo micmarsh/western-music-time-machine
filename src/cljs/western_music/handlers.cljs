@@ -1,8 +1,10 @@
 (ns western-music.handlers
   (:require [re-frame.core :refer [def-event path after debug dispatch]]
             [western-music.lib.composition :as composition]
+            [western-music.protocols :as p]
             [western-music.spec :as spec]
             [western-music.lib.ui :as ui]
+            [western-music.util :as util]
             [clojure.spec :as s]
             [ajax.core :refer [GET]]
             [ajax.edn :as edn]
@@ -56,9 +58,11 @@
   :select-composer
   ui/verify-all-data
   (fn [all-data [_ composer]]
-    (-> all-data
-        (ui/track-list-by-composer composer)
-        (ui/set-composer composer))))
+    (let [current (ui/get-composer all-data)
+          composer (when-not (util/string= (p/id composer) (p/id current)) composer)]
+      (-> all-data
+          (ui/track-list-by-composer composer)
+          (ui/set-composer composer)))))
 
 ;; Track List and Queue manipulation
 (def-event
