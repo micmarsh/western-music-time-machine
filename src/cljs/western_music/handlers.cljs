@@ -1,8 +1,10 @@
 (ns western-music.handlers
   (:require [re-frame.core :refer [def-event path after debug dispatch]]
             [western-music.lib.composition :as composition]
+            [western-music.protocols :as p]
             [western-music.spec :as spec]
             [western-music.lib.ui :as ui]
+            [western-music.util :as util]
             [clojure.spec :as s]
             [ajax.core :refer [GET]]
             [ajax.edn :as edn]
@@ -55,10 +57,12 @@
 (def-event
   :select-composer
   ui/verify-all-data
-  (fn [all-data [_ composer]]
-    (-> all-data
-        (ui/track-list-by-composer composer)
-        (ui/set-composer composer))))
+  (fn [all-data [_ composer-id]]
+    (let [current (ui/get-composer all-data)
+          composer-id (when-not (util/string= composer-id (p/id current)) composer-id)]
+      (-> all-data
+          (ui/set-track-list-by-composer composer-id)
+          (ui/set-composer composer-id)))))
 
 ;; Track List and Queue manipulation
 (def-event
@@ -76,6 +80,30 @@
     (->> track-id
          (ui/player-track-lookup player)
          (ui/player-enqueue-track player))))
+
+(def-event
+  :enqueue-composer
+  (fn [all-data [_ composer-id]]
+    (ui/enqueue-composer all-data composer-id)))
+
+(def-event
+  :play-composer
+  (fn [all-data [_ composer-id]]
+    (-> all-data
+        (ui/enqueue-composer composer-id)
+        (update-in ui/player-path ui/player-play))))
+
+(def-event
+  :enqueue-nation
+  (fn [all-data [_ nation-id]]
+    (ui/enqueue-nation all-data nation-id)))
+
+(def-event
+  :play-nation
+  (fn [all-data [_ nation-id]]
+    (-> all-data
+        (ui/enqueue-nation nation-id)
+        (update-in ui/player-path ui/player-play))))
 
 (def-event
   :dequeue-track

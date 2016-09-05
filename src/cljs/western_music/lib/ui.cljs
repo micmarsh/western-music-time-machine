@@ -62,12 +62,23 @@
   [raw-data composition]
   (conj (or raw-data []) composition))
 
-(defn track-list-by-composer
-  [{compositions :data/raw :as all-data} composer]
+(defn tracks-by-composer
+  [composer-id compositions]
   (->> compositions
-       (filter (comp (partial util/string= composer) composition/composer-name))
-       (map composition/track)
-       (assoc-in all-data [:data/ui :ui/player :player/track-list])))
+       (filter (comp (partial util/string= composer-id) composition/composer-name))
+       (map composition/track)))
+
+(defn tracks-by-nation
+  [nation-id compositions]
+  (->> compositions
+       (filter (comp (partial util/string= nation-id) composition/nation-id))
+       (map composition/track)))
+
+(defn set-track-list-by-composer
+  [{compositions :data/raw :as all-data} composer-id]
+  (assoc-in all-data
+            [:data/ui :ui/player :player/track-list]
+            (tracks-by-composer composer-id compositions)))
 
 (def ^:const nation-focus-path
   [:data/ui :ui/nation :ui.nation/mouse-on])
@@ -80,6 +91,9 @@
 
 (defn set-composer [all-data composer]
   (assoc-in all-data [:data/ui :ui/composer] composer))
+
+(defn get-composer [all-data]
+  (get-in all-data [:data/ui :ui/composer]))
 
 (defn enqueue-track 
   "Enqueues a track that hasn't already been added to the given collection"
@@ -172,6 +186,20 @@
     (player-at-end? p) (player-pause)
     (not (player-at-end? p)) (player-forward)
     true (update :player/queue remove-track (:track/id ended))))
+
+(defn player-enqueue-all
+  [player tracks]
+  (reduce player-enqueue-track player tracks))
+
+(defn enqueue-composer
+  [all-data composer-id]
+  (let [tracks (tracks-by-composer composer-id (:data/raw all-data))]
+    (update-in all-data player-path player-enqueue-all tracks)))
+
+(defn enqueue-nation
+  [all-data nation-id]
+  (let [tracks (tracks-by-nation nation-id (:data/raw all-data))]
+    (update-in all-data player-path player-enqueue-all tracks)))
 
 (defn selected-nation [ui]
   (or (:ui.nation/selected (:ui/nation ui))

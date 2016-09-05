@@ -279,6 +279,10 @@ div #tabs input[type=radio]:checked + label + div {
     font-size: 35px;
 }
 
+.smaller-icons {
+    font-size: 20px;
+}
+
 .list-item-text {
     margin-left: 10px;
 }
@@ -292,4 +296,16 @@ div #tabs input[type=radio]:checked + label + div {
 
 #player-controls .material-icons {
     font-size: 50px;
+}
+ 
+#nation-header {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.composer-header {
+    display: flex;
+    justify-content: left;
+    align-items: center;
 }

@@ -29,7 +29,7 @@
       [:div#composer-tracks
        (with-dividers
          (for [track @tracks
-                :let [id (p/id track)]]
+               :let [id (p/id track)]]
            [:div.track-list-item {:key id}
             (icon #(dispatch [:play-track id]) "play_arrow")
             (icon #(dispatch [:enqueue-track id]) "queue_music")
@@ -39,37 +39,48 @@
                           #(dispatch [:enqueue-track id]))}
              (p/display track)]]))])))
 
+(defn nation-header
+  []
+  (let [nation (subscribe [:selected-nation])
+        composers (subscribe [:selected-composers])
+        queue (subscribe [:track-queue])]
+    (fn []
+      (if (nil? @nation)
+        [:h3 "(select a nation from the map)"]
+        [:div#nation-header
+         [:h2 (p/display @nation)]
+         (when-not (empty? @composers)
+           (if (empty? @queue)
+             (icon #(dispatch [:play-nation (p/id @nation)]) "play_arrow")
+             (icon #(dispatch [:enqueue-nation (p/id @nation)]) "queue_music")))]))))
+
 (defn composer-list
   []
   (let [composers (subscribe [:selected-composers])
         selected-composer (subscribe [:selected-composer])
-        nation (subscribe [:selected-nation])]
+        queue (subscribe [:track-queue])]
     (fn []
-      [:div#selection-list
-       (if (nil? @nation)
-         [:h3 "(select a nation from the map)"]
-         [:h2 (p/display @nation)])
+      [:div
        (with-dividers
          (for [composer @composers
                :let [id (p/id composer)]]
-           [:div {:key id :on-click #(dispatch [:select-composer id])}
-            (p/display composer)
+           [:div {:key id}
+            [:div.composer-header
+             (icon {:class "smaller-icons"} #(dispatch [:select-composer id])
+                   (if (= id (p/id @selected-composer))
+                     "expand_more"
+                     "chevron_right"))
+             [:div {:on-click #(dispatch [:select-composer id])}
+              (p/display composer)]
+             (if (empty? @queue)
+               (icon #(dispatch [:play-composer id]) "play_arrow")
+               (icon #(dispatch [:enqueue-composer id]) "queue_music"))]
             (when (= id (p/id @selected-composer))
               [composition-list])]))])))
 
-(defn track-composer
-  "SUPER BIG HACK separating notion of display value and internal ref id
-   will go a long way towards fixing this"
-  [track]
-  (first (clojure.string/split track #" - ")))
-
-(defn track-composition
-  "SUPER BIG HACK separating notion of display value and internal ref id
-   will go a long way towards fixing this"
-  [track]
-  (->> (clojure.string/split track #" - ")
-       (rest)
-       (clojure.string/join " - ")))
+(defn selection-list
+  []
+  [:div#selection-list [nation-header] [composer-list]])
 
 (defn track-queue
   []
@@ -103,7 +114,7 @@
       [:div#tabs
        [:input#selection-tab {:type "radio" :name "grp"}]
        [:label {:for "selection-tab"} "Selection"]
-       [:div.tab-content [composer-list]]
+       [:div.tab-content [selection-list]]
        [:input#queue-tab {:type "radio" :name "grp"}]
        [:label {:for "queue-tab"}
         (str "Play Queue" (when-not (empty? @q) (str " (" (count @q) ")")))]
