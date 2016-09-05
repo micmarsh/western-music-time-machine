@@ -57,12 +57,12 @@
 (def-event
   :select-composer
   ui/verify-all-data
-  (fn [all-data [_ composer]]
+  (fn [all-data [_ composer-id]]
     (let [current (ui/get-composer all-data)
-          composer (when-not (util/string= (p/id composer) (p/id current)) composer)]
+          composer-id (when-not (util/string= composer-id (p/id current)) composer-id)]
       (-> all-data
-          (ui/track-list-by-composer composer)
-          (ui/set-composer composer)))))
+          (ui/set-track-list-by-composer composer-id)
+          (ui/set-composer composer-id)))))
 
 ;; Track List and Queue manipulation
 (def-event
@@ -80,6 +80,18 @@
     (->> track-id
          (ui/player-track-lookup player)
          (ui/player-enqueue-track player))))
+
+(def-event
+  :enqueue-composer
+  (fn [all-data [_ composer-id]]
+    (ui/enqueue-composer all-data composer-id)))
+
+(def-event
+  :play-composer
+  (fn [all-data [_ composer-id]]
+    (-> all-data
+        (ui/enqueue-composer composer-id)
+        (update-in ui/player-path ui/player-play))))
 
 (def-event
   :dequeue-track

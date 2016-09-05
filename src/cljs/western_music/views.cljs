@@ -73,8 +73,8 @@
              [:div {:on-click #(dispatch [:select-composer id])}
               (p/display composer)]
              (if (empty? @queue)
-               (icon #(dispatch [:play-composer (p/id composer)]) "play_arrow")
-               (icon #(dispatch [:enqueue-composer (p/id composer)]) "queue_music"))]
+               (icon #(dispatch [:play-composer id]) "play_arrow")
+               (icon #(dispatch [:enqueue-composer id]) "queue_music"))]
             (when (= id (p/id @selected-composer))
               [composition-list])]))])))
 
