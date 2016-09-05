@@ -94,6 +94,18 @@
         (update-in ui/player-path ui/player-play))))
 
 (def-event
+  :enqueue-nation
+  (fn [all-data [_ nation-id]]
+    (ui/enqueue-nation all-data nation-id)))
+
+(def-event
+  :play-nation
+  (fn [all-data [_ nation-id]]
+    (-> all-data
+        (ui/enqueue-nation nation-id)
+        (update-in ui/player-path ui/player-play))))
+
+(def-event
   :dequeue-track
   [ui/verify-all-data (path ui/player-path)]
   (fn [player [_ track-id]]

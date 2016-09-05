@@ -51,8 +51,8 @@
          [:h2 (p/display @nation)]
          (when-not (empty? @composers)
            (if (empty? @queue)
-             (icon #(dispatch [:play-nation (p/id nation)]) "play_arrow")
-             (icon #(dispatch [:enqueue-nation (p/id nation)]) "queue_music")))]))))
+             (icon #(dispatch [:play-nation (p/id @nation)]) "play_arrow")
+             (icon #(dispatch [:enqueue-nation (p/id @nation)]) "queue_music")))]))))
 
 (defn composer-list
   []
