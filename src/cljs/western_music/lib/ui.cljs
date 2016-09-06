@@ -26,9 +26,12 @@
 (s/def :ui/player
   (s/keys :req [:player/queue
                 :player/track-list
-                :player/paused]))
+                :player/paused
+                :player/shuffle-memory]))
 
 (s/def :player/paused boolean?)
+
+(s/def :player/shuffle-memory (s/nilable ::spec/track-list))
 
 (s/def :player/queue ::spec/track-list)
 
@@ -50,7 +53,8 @@
   #:ui{:player #:player{:queue []
                         :track-list []
                         :paused true
-                        :playing nil}
+                        :playing nil
+                        :shuffle-memory nil}
        :nation #:ui.nation{:mouse-on nil
                            :selected nil}
        :composer nil})
@@ -158,9 +162,32 @@
   (cond-> p
     (not (player-at-beginning? p)) (player-set-playing (q (dec (player-index p))) paused?)))
 
-(defn player-forward [{q :player/queue paused? :player/paused :as p}]
+(def player-shuffling? (comp not nil? :player/shuffle-memory))
+
+(defn player-shuffle-forward
+  [{q :player/queue
+    paused? :player/paused
+    current :player/playing
+    shuffle-mem :player/shuffle-memory
+    :as p}]
+  (let [mem-fn (comp boolean (into #{} (map :track/id) shuffle-mem) :track/id)
+        next-track (util/rand-mem mem-fn q (* 5 (count shuffle-mem)))
+        done? (= ::util/generator-exhausted next-track)]
+    (cond-> p    
+      done? (player-set-playing (first shuffle-mem) paused?)
+      done? (assoc :player/shuffle-memory [])    
+      (not done?) (player-set-playing next-track paused?)
+      (not done?) (update :player/shuffle-memory enqueue-track next-track))))
+
+(defn player-forward*
+  [{q :player/queue paused? :player/paused :as p}]
   (cond-> p
     (not (player-at-end? p)) (player-set-playing (q (inc (player-index p))) paused?)))
+
+(defn player-forward [player]
+  (if (player-shuffling? player)
+    (player-shuffle-forward player)
+    (player-forward* player)))
 
 (defn currently-playing? [player track-id]
   (-> player :player/playing :track/id (= track-id)))
@@ -216,3 +243,10 @@
 (def player-playing :player/playing)
 
 (def player-paused? :player/paused)
+
+(defn player-start-shuffling [player]
+  (cond-> player
+    (not (player-shuffling? player)) (assoc :player/shuffle-memory [])))
+
+(defn player-stop-shuffling [player]
+  (assoc player :player/shuffle-memory nil))

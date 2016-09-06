@@ -96,3 +96,9 @@
   :<- [:player]
   (fn [player _]
     (ui/player-paused? player)))
+
+(def-sub
+  :shuffle-on?
+  :<- [:player]
+  (fn [player _]
+    (ui/player-shuffling? player))) 

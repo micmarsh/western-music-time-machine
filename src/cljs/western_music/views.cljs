@@ -99,14 +99,18 @@
 
 (defn player-controls
   []
-  (let [paused? (subscribe [:paused?])]
+  (let [paused? (subscribe [:paused?])
+        shuffle? (subscribe [:shuffle-on?])]
     (fn []
       [:div#player-controls
        (icon #(dispatch [:player-back]) "skip_previous")
        (if @paused?
          (icon #(dispatch [:player-play]) "play_arrow")
          (icon #(dispatch [:player-pause]) "pause"))
-       (icon #(dispatch [:player-forward]) "skip_next")])))
+       (icon #(dispatch [:player-forward]) "skip_next")
+       (if @shuffle?
+         [:button {:on-click #(dispatch [:shuffle-off])} "shuffle off"]
+         (icon #(dispatch [:shuffle-on]) "shuffle"))])))
 
 (defn track-tabs []
   (let [q (subscribe [:track-queue])]

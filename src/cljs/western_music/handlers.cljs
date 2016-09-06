@@ -141,3 +141,15 @@
   :current-track-ended
   (path ui/player-path)
   (fn [player _] (ui/player-track-ended player)))
+
+(def-event
+  :shuffle-on
+  (path ui/player-path)
+  (fn [player _]
+    (ui/player-start-shuffling player)))
+
+(def-event
+  :shuffle-off
+  (path ui/player-path)
+  (fn [player _]
+    (ui/player-stop-shuffling player)))

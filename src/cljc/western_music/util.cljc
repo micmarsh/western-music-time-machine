@@ -42,6 +42,24 @@
 (defmacro for' [& parts]
   `(doall (for ~@parts)))
 
+(defprotocol RandomGen
+  (random [obj]))
+
+(extend-protocol RandomGen
+  #?(:clj clojure.lang.ISeq
+     :cljs cljs.core.PersistentVector)
+  (random [s] (rand-nth s)))
+
+(defn rand-mem
+  ([already-chosen? gen]
+   (rand-mem already-chosen? gen 200))
+  ([already-chosen? gen tries]
+   (let [item (random gen)]
+     (cond
+       (= tries 0) ::generator-exhausted
+       (already-chosen? item) (recur already-chosen? gen (dec tries))
+       :else item))))
+
 (comment
   (merge-with merge {:foo {:bar {:baz "yo"}}} {:foo {:bar {:hello "world"}}})
   (merge-recursive {:foo {:bar {:baz "yo"}}} {:foo {:bar {:hello "world"}}})
