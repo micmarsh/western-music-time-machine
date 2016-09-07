@@ -13,7 +13,8 @@
   :profiles {:dev {:dependencies [[org.clojure/clojurescript "0.0-MERGE-FIX"]
                                   [re-frame "0.8.0-alpha2"]
                                   [cljs-ajax "0.5.8"]
-                                  
+
+                                  [org.clojure/test.check "0.9.0"]
                                   [enlive "1.1.6"]
                                   [org.clojure/tools.cli "0.3.5"]
                                   [clj-http-lite "0.3.0"]

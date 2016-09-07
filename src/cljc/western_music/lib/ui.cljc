@@ -1,10 +1,18 @@
 (ns western-music.lib.ui
-  (:require [re-frame.core :refer [after debug dispatch]]
+  (:require #?(:cljs [re-frame.core :refer [after debug dispatch]])
             [western-music.lib.composition :as composition]
             [western-music.lib.track]
             [western-music.spec :as spec]
             [western-music.util :as util]
             [clojure.spec :as s]))
+
+#?(:clj
+   (do
+     (def fake-dispatch-results (atom []))
+     
+     (defn dispatch [arg]
+       (swap! fake-dispatch-results conj arg))
+     ))
 
 (s/def :data/raw (s/coll-of ::spec/composition))
 
@@ -46,8 +54,10 @@
     (throw (ex-info (str "spec check failed: " (s/explain-str spec data))
                     (s/explain-data spec data)))))
 
-(def verify-all-data
-  (after (partial check-and-throw (s/keys :req [:data/raw :data/ui]))))
+#?(:cljs
+   (def verify-all-data
+     (after (partial check-and-throw (s/keys :req [:data/raw :data/ui]))))
+   )
 
 (def ^:const blank
   #:ui{:player #:player{:queue []
