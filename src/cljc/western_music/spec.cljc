@@ -1,6 +1,7 @@
 (ns western-music.spec
   (:require [clojure.spec :as s]
-            [clojure.spec.gen :as gen]))
+            [#?(:clj clojure.spec.gen
+                :cljs cljs.spec.impl.gen) :as gen]))
 
 (defn force-tracks [{composer ::composer :as composition}]
   (update composition :composition/tracks
@@ -33,11 +34,7 @@
 
 (s/def :composer/name string?)
 
-(s/def ::place-time
-  #?(:cljs (s/merge-spec-impl [::place ::time]
-                              [::place ::time]
-                              nil)
-     :clj (s/merge ::place ::time)))
+(s/def ::place-time (s/merge ::place ::time))
 
 (s/def :composer/birth ::place-time)
 
