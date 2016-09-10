@@ -4,7 +4,9 @@
             [western-music.spec :as spec]
             [western-music.lib.track]
             [western-music.util :as util]
-            [clojure.spec :as s]))
+            [clojure.spec :as s]
+            [#?(:cljs cljs.spec.impl.gen
+                :clj clojure.spec.gen) :as gen]))
 
 #?(:clj
    (do
@@ -32,10 +34,20 @@
 (s/def :ui/composer (s/nilable :composer/name))
 
 (s/def :ui/player
-  (s/keys :req [:player/queue
-                :player/track-list
-                :player/paused
-                :player/shuffle-memory]))
+  (s/with-gen
+    (s/and (s/keys :req [:player/queue
+                         :player/track-list
+                         :player/paused
+                         :player/playing
+                         :player/shuffle-memory])
+           (fn [{playing :player/playing q :player/queue}]
+             ((into #{} (map :track/id) q) (:track/id playing))))
+    #(gen/fmap (fn [{playing :player/playing q :player/queue :as p}]
+                 (if playing
+                   (assoc p :player/playing (first q))
+                   p))
+               ;; TODO some separate, unchecked stuff, as seen with compositions
+               )))
 
 (s/def :player/paused boolean?)
 

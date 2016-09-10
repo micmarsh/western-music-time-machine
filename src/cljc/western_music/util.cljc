@@ -45,10 +45,15 @@
 (defprotocol RandomGen
   (random [obj]))
 
+(def ^:dynamic *random-seed* nil)
+
 (extend-protocol RandomGen
-  #?(:clj clojure.lang.ISeq
+  #?(:clj clojure.lang.PersistentVector
      :cljs cljs.core.PersistentVector)
-  (random [s] (rand-nth s)))
+  (random [s]
+    (if (number? *random-seed*)
+      (nth s (mod *random-seed* (count s)))
+      (rand-nth s))))
 
 (defn rand-mem
   ([already-chosen? gen]
