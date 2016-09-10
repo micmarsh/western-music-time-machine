@@ -1,8 +1,8 @@
 (ns western-music.lib.ui
   (:require #?(:cljs [re-frame.core :refer [after debug dispatch]])
             [western-music.lib.composition :as composition]
-            [western-music.lib.track]
             [western-music.spec :as spec]
+            [western-music.lib.track]
             [western-music.util :as util]
             [clojure.spec :as s]))
 
@@ -47,16 +47,11 @@
 
 (s/def :player/playing (s/nilable ::spec/track))
 
-(defn check-and-throw
-  "throw an exception if db doesn't match the spec."
-  [spec data]
-  (when-not (s/valid? spec data)
-    (throw (ex-info (str "spec check failed: " (s/explain-str spec data))
-                    (s/explain-data spec data)))))
+(def all-data-spec (s/keys :req [:data/raw :data/ui]))
 
 #?(:cljs
    (def verify-all-data
-     (after (partial check-and-throw (s/keys :req [:data/raw :data/ui]))))
+     (after (partial spec/verify all-data-spec)))
    )
 
 (def ^:const blank
@@ -108,6 +103,14 @@
 
 (defn get-composer [all-data]
   (get-in all-data [:data/ui :ui/composer]))
+
+(defn select-composer
+  [all-data composer-id]
+  (let [current (get-composer all-data)
+        composer-id (when-not (util/string= composer-id current) composer-id)]
+    (-> all-data
+        (set-track-list-by-composer composer-id)
+        (set-composer composer-id))))
 
 (defn enqueue-track 
   "Enqueues a track that hasn't already been added to the given collection"

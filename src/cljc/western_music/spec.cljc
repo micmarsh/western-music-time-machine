@@ -1,11 +1,29 @@
 (ns western-music.spec
-  (:require [clojure.spec :as s]))
+  (:require [clojure.spec :as s]
+            [#?(:clj clojure.spec.gen
+                :cljs cljs.spec.impl.gen) :as gen]))
 
-(s/def ::composition
+(defn force-tracks [{composer ::composer :as composition}]
+  (update composition :composition/tracks
+          (partial mapv
+                   (fn [track]
+                     (merge track
+                            #:track{:artist (:composer/name composer)
+                                    :title (:composition/name composition)})))))
+
+(s/def ::composition-unchecked-tracks
   (s/keys :req [:composition/id 
                 :composition/name
                 :composition/tracks 
                 ::composer]))
+
+(s/def ::composition
+  (s/with-gen
+    (s/and ::composition-unchecked-tracks
+           (fn [{tracks :composition/tracks composer ::composer}]
+             (every? #{(:composer/name composer)}
+                     (map :track/artist tracks))))
+    #(gen/fmap force-tracks (s/gen ::composition-unchecked-tracks))))
 
 (s/def :composition/id int?)
 
@@ -16,11 +34,7 @@
 
 (s/def :composer/name string?)
 
-(s/def ::place-time
-  #?(:cljs (s/merge-spec-impl [::place ::time]
-                              [::place ::time]
-                              nil)
-     :clj (s/merge ::place ::time)))
+(s/def ::place-time (s/merge ::place ::time))
 
 (s/def :composer/birth ::place-time)
 
@@ -77,7 +91,10 @@
 
 (s/def :track/title string?)
 
-(s/def :track/id int?)
+(s/def :track/id
+  (s/with-gen int?
+    (let [ids (atom 0)]
+      #(gen/fmap (fn [_] (swap! ids inc)) (s/gen int?)))))
 
 (s/def ::track (s/multi-spec track-spec :track/type))
 
@@ -89,7 +106,10 @@
   (s/and (s/coll-of ::track)
          unique-track-ids?))
 
-(s/def :composition/tracks ::track-list)
+(s/def :composition/tracks
+  (s/with-gen ::track-list
+    #(s/gen (s/and ::track-list
+                   not-empty))))
 
 (defn verify [spec item]
   (if (s/valid? spec item)
