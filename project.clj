@@ -20,6 +20,7 @@
                                   [clj-http-lite "0.3.0"]
                                   [clj-time "0.5.0"]
                                   [cheshire "5.6.3"]]
+                   :source-paths ["test/cljc"]
                    :cljsbuild {:builds {:client {:source-paths ["devsrc"]
                                                  :compiler     {:main "western-music.dev"
                                                                 :asset-path "js"

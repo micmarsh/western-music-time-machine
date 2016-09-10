@@ -1,5 +1,6 @@
 (ns western-music.spec
-  (:require [clojure.spec :as s]))
+  (:require [clojure.spec :as s]
+            [clojure.spec.gen :as gen]))
 
 (s/def ::composition
   (s/keys :req [:composition/id 
@@ -77,7 +78,10 @@
 
 (s/def :track/title string?)
 
-(s/def :track/id int?)
+(s/def :track/id
+  (s/with-gen int?
+    (let [ids (atom 0)]
+      #(gen/fmap (fn [_] (swap! ids inc)) (s/gen int?)))))
 
 (s/def ::track (s/multi-spec track-spec :track/type))
 
@@ -89,7 +93,10 @@
   (s/and (s/coll-of ::track)
          unique-track-ids?))
 
-(s/def :composition/tracks ::track-list)
+(s/def :composition/tracks
+  (s/with-gen ::track-list
+    #(s/gen (s/and ::track-list
+                   not-empty))))
 
 (defn verify [spec item]
   (if (s/valid? spec item)

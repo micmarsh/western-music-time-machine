@@ -58,11 +58,7 @@
   :select-composer
   ui/verify-all-data
   (fn [all-data [_ composer-id]]
-    (let [current (ui/get-composer all-data)
-          composer-id (when-not (util/string= composer-id (p/id current)) composer-id)]
-      (-> all-data
-          (ui/set-track-list-by-composer composer-id)
-          (ui/set-composer composer-id)))))
+    (ui/select-composer all-data composer-id)))
 
 ;; Track List and Queue manipulation
 (def-event
