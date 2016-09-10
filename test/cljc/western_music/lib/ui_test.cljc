@@ -36,5 +36,5 @@
          with-selected (ui/select-composer (:all sample) composer-name)]
      (->> (:data/ui with-selected)
           (ui/track-list)
-          (map comp/composer-name)
+          (map :track/artist)
           (every? #{composer-name})))))

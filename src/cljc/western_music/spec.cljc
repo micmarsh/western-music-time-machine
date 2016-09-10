@@ -2,11 +2,27 @@
   (:require [clojure.spec :as s]
             [clojure.spec.gen :as gen]))
 
-(s/def ::composition
+(defn force-tracks [{composer ::composer :as composition}]
+  (update composition :composition/tracks
+          (partial mapv
+                   (fn [track]
+                     (merge track
+                            #:track{:artist (:composer/name composer)
+                                    :title (:composition/name composition)})))))
+
+(s/def ::composition-unchecked-tracks
   (s/keys :req [:composition/id 
                 :composition/name
                 :composition/tracks 
                 ::composer]))
+
+(s/def ::composition
+  (s/with-gen
+    (s/and ::composition-unchecked-tracks
+           (fn [{tracks :composition/tracks composer ::composer}]
+             (every? #{(:composer/name composer)}
+                     (map :track/artist tracks))))
+    #(gen/fmap force-tracks (s/gen ::composition-unchecked-tracks))))
 
 (s/def :composition/id int?)
 
