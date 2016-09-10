@@ -18,11 +18,7 @@
                  :all all-data}))
             all-data-gen))
 
-#_(defspec dummy-base-case 100
-  (prop/for-all [data all-data-gen]
-                (try (spec/verify ui/all-data-spec data) (catch Exception e))))
-
-(defspec test-select-composer-data-spec 10
+(defspec test-select-composer-data-spec 30
   (prop/for-all
    [sample with-composer-set]
    (try
@@ -33,7 +29,7 @@
        (println (ex-data e))
        false))))
 
-#_(defspec test-select-composer-ui-tracks 30
+(defspec test-select-composer-ui-tracks 30
   (prop/for-all
    [sample with-composer-set]
    (let [composer-name (first (:composers sample))
@@ -42,8 +38,3 @@
           (ui/track-list)
           (map comp/composer-name)
           (every? #{composer-name})))))
-
-(comment
-  (require '[clojure.spec :as s]
-           '[clojure.spec.gen :as gen])
-  )

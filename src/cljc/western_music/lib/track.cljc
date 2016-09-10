@@ -8,7 +8,7 @@
 
 (defmethod spec/track-spec :track/youtube
   [_]
-  (s/keys :reqs [:track/type
+  (s/keys :req [:track/type
                  :track/artist
                  :track/title
                  :track/youtube-id
