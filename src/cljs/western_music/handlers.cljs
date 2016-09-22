@@ -1,5 +1,5 @@
 (ns western-music.handlers
-  (:require [re-frame.core :refer [def-event path after debug dispatch]]
+  (:require [re-frame.core :refer [reg-event-db path after debug dispatch]]
             [western-music.lib.composition :as composition]
             [western-music.protocols :as p]
             [western-music.spec :as spec]
@@ -19,7 +19,7 @@
        (str "?&_=")
        (str url)))
 
-(def-event
+(reg-event-db
   :initialize-data
   ui/verify-all-data
   (fn [data _]
@@ -31,7 +31,7 @@
           :response-format (edn/edn-response-format)})
     ui/initial-data))
 
-(def-event
+(reg-event-db
   :new-composition-data
   (path :data/raw)
   (fn [raw-data [_ composition]]
@@ -39,22 +39,22 @@
 
 (defn set-value-handler [_ [_ value]] value)
 
-(def-event
+(reg-event-db
   :focus-nation
   (path ui/nation-focus-path)
   set-value-handler)
 
-(def-event
+(reg-event-db
   :select-nation
   (path ui/nation-selected-path)
   set-value-handler)
 
-(def-event
+(reg-event-db
   :select-blank
   [ui/verify-all-data (path :data/ui)]
   (fn [ui _] (ui/reset-selection ui)))
 
-(def-event
+(reg-event-db
   :select-composer
   ui/verify-all-data
   (fn [all-data [_ composer-id]]
@@ -65,7 +65,7 @@
           (ui/set-composer composer-id)))))
 
 ;; Track List and Queue manipulation
-(def-event
+(reg-event-db
   :play-track
   (path ui/player-path)
   (fn [player [_ track-id]]
@@ -73,7 +73,7 @@
          (ui/player-track-lookup player)
          (ui/player-play-track player))))
 
-(def-event
+(reg-event-db
   :enqueue-track
   (path ui/player-path)
   (fn [player [_ track-id]]
@@ -81,63 +81,63 @@
          (ui/player-track-lookup player)
          (ui/player-enqueue-track player))))
 
-(def-event
+(reg-event-db
   :enqueue-composer
   (fn [all-data [_ composer-id]]
     (ui/enqueue-composer all-data composer-id)))
 
-(def-event
+(reg-event-db
   :play-composer
   (fn [all-data [_ composer-id]]
     (-> all-data
         (ui/enqueue-composer composer-id)
         (update-in ui/player-path ui/player-play))))
 
-(def-event
+(reg-event-db
   :enqueue-nation
   (fn [all-data [_ nation-id]]
     (ui/enqueue-nation all-data nation-id)))
 
-(def-event
+(reg-event-db
   :play-nation
   (fn [all-data [_ nation-id]]
     (-> all-data
         (ui/enqueue-nation nation-id)
         (update-in ui/player-path ui/player-play))))
 
-(def-event
+(reg-event-db
   :dequeue-track
   [ui/verify-all-data (path ui/player-path)]
   (fn [player [_ track-id]]
     (ui/player-dequeue-track player track-id)))
 
-(def-event
+(reg-event-db
   :clear-queue
   [ui/verify-all-data (path ui/player-path)]
   (fn [player _] (ui/player-clear-queue player)))
 
 ;; Player Controls
-(def-event
+(reg-event-db
   :player-play
   [ui/verify-all-data (path ui/player-path)]
   (fn [player _] (ui/player-play player)))
 
-(def-event
+(reg-event-db
   :player-pause
   (path ui/player-path)
   (fn [player _] (ui/player-pause player)))
 
-(def-event
+(reg-event-db
   :player-back
   [ui/verify-all-data (path ui/player-path)]
   (fn [player _] (ui/player-back player)))
 
-(def-event
+(reg-event-db
   :player-forward
   [ui/verify-all-data (path ui/player-path)]
   (fn [player _] (ui/player-forward player)))
 
-(def-event
+(reg-event-db
   :current-track-ended
   (path ui/player-path)
   (fn [player _] (ui/player-track-ended player)))

@@ -1,5 +1,5 @@
 (ns western-music.handlers.youtube
-  (:require [re-frame.core :refer [def-event dispatch]]
+  (:require [re-frame.core :refer [reg-event-db dispatch]]
             [western-music.lib.ui :as ui]))
 
 (def player)
@@ -42,13 +42,13 @@
       (set! player (Player. "youtube-player" player-options)))
     (js/setTimeout initialize 1000)))
 
-(def-event
+(reg-event-db
   :initialize-player
   (fn [data _]
     (initialize)
     data))
 
-(def-event
+(reg-event-db
   :new-track-playing
   (fn [data [_ {id :track/youtube-id} paused?]]
     (when (nil? (.-loadVideoById player))) ;; TODO something elegant
@@ -58,19 +58,19 @@
       (.loadVideoById player id))
     data))
 
-(def-event
+(reg-event-db
   :current-track-playing
   (fn [data _]
     (.playVideo player)
     data))
 
-(def-event
+(reg-event-db
   :current-track-paused
   (fn [data _]
     (.pauseVideo player)
     data))
 
-(def-event
+(reg-event-db
   :all-tracks-cleared
   (fn [data _]
     (.cueVideoById player "")

@@ -1,10 +1,20 @@
 (ns western-music.lib.ui
-  (:require [re-frame.core :refer [after debug dispatch]]
+  (:require #?(:cljs [re-frame.core :refer [after debug dispatch]])
             [western-music.lib.composition :as composition]
-            [western-music.lib.track]
             [western-music.spec :as spec]
+            [western-music.lib.track]
             [western-music.util :as util]
-            [clojure.spec :as s]))
+            [clojure.spec :as s]
+            [#?(:cljs cljs.spec.impl.gen
+                :clj clojure.spec.gen) :as gen]))
+
+#?(:clj
+   (do
+     (def fake-dispatch-results (atom []))
+     
+     (defn dispatch [arg]
+       (swap! fake-dispatch-results conj arg))
+     ))
 
 (s/def :data/raw (s/coll-of ::spec/composition))
 
@@ -24,11 +34,27 @@
 (s/def :ui/composer (s/nilable :composer/name))
 
 (s/def :ui/player
-  (s/keys :req [:player/queue
-                :player/track-list
-                :player/paused]))
+  (s/and (s/keys :req [:player/queue
+                       :player/track-list
+                       :player/paused
+                       :player/playing
+                       :player/shuffle-memory])
+         (fn [{playing :player/playing q :player/queue}]
+           (if playing
+             (contains? (into #{} (map :track/id) q) (:track/id playing))
+             true)))
+  #_(s/with-gen
+
+    #(gen/fmap (fn [{playing :player/playing q :player/queue :as p}]
+                 (if playing
+                   (assoc p :player/playing (first q))
+                   p))
+               ;; TODO some separate, unchecked stuff, as seen with compositions
+               )))
 
 (s/def :player/paused boolean?)
+
+(s/def :player/shuffle-memory (s/nilable ::spec/track-list))
 
 (s/def :player/queue ::spec/track-list)
 
@@ -36,21 +62,19 @@
 
 (s/def :player/playing (s/nilable ::spec/track))
 
-(defn check-and-throw
-  "throw an exception if db doesn't match the spec."
-  [spec data]
-  (when-not (s/valid? spec data)
-    (throw (ex-info (str "spec check failed: " (s/explain-str spec data))
-                    (s/explain-data spec data)))))
+(def all-data-spec (s/keys :req [:data/raw :data/ui]))
 
-(def verify-all-data
-  (after (partial check-and-throw (s/keys :req [:data/raw :data/ui]))))
+#?(:cljs
+   (def verify-all-data
+     (after (partial spec/verify all-data-spec)))
+   )
 
 (def ^:const blank
   #:ui{:player #:player{:queue []
                         :track-list []
                         :paused true
-                        :playing nil}
+                        :playing nil
+                        :shuffle-memory nil}
        :nation #:ui.nation{:mouse-on nil
                            :selected nil}
        :composer nil})
@@ -94,6 +118,14 @@
 
 (defn get-composer [all-data]
   (get-in all-data [:data/ui :ui/composer]))
+
+(defn select-composer
+  [all-data composer-id]
+  (let [current (get-composer all-data)
+        composer-id (when-not (util/string= composer-id current) composer-id)]
+    (-> all-data
+        (set-track-list-by-composer composer-id)
+        (set-composer composer-id))))
 
 (defn enqueue-track 
   "Enqueues a track that hasn't already been added to the given collection"
@@ -158,9 +190,32 @@
   (cond-> p
     (not (player-at-beginning? p)) (player-set-playing (q (dec (player-index p))) paused?)))
 
-(defn player-forward [{q :player/queue paused? :player/paused :as p}]
+(def player-shuffling? (comp not nil? :player/shuffle-memory))
+
+(defn player-shuffle-forward
+  [{q :player/queue
+    paused? :player/paused
+    current :player/playing
+    shuffle-mem :player/shuffle-memory
+    :as p}]
+  (let [mem-fn (comp boolean (into #{} (map :track/id) shuffle-mem) :track/id)
+        next-track (util/rand-mem mem-fn q (* 5 (count shuffle-mem)))
+        done? (= ::util/generator-exhausted next-track)]
+    (cond-> p    
+      done? (player-set-playing (first shuffle-mem) paused?)
+      done? (assoc :player/shuffle-memory [])    
+      (not done?) (player-set-playing next-track paused?)
+      (not done?) (update :player/shuffle-memory enqueue-track next-track))))
+
+(defn player-forward*
+  [{q :player/queue paused? :player/paused :as p}]
   (cond-> p
     (not (player-at-end? p)) (player-set-playing (q (inc (player-index p))) paused?)))
+
+(defn player-forward [player]
+  (if (player-shuffling? player)
+    (player-shuffle-forward player)
+    (player-forward* player)))
 
 (defn currently-playing? [player track-id]
   (-> player :player/playing :track/id (= track-id)))
@@ -216,3 +271,10 @@
 (def player-playing :player/playing)
 
 (def player-paused? :player/paused)
+
+(defn player-start-shuffling [player]
+  (cond-> player
+    (not (player-shuffling? player)) (assoc :player/shuffle-memory [])))
+
+(defn player-stop-shuffling [player]
+  (assoc player :player/shuffle-memory nil))

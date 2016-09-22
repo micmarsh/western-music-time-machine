@@ -1,7 +1,7 @@
 (ns western-music.handlers.map
-  (:require [re-frame.core :refer [def-event]]))
+  (:require [re-frame.core :refer [reg-event-db]]))
 
-(def-event
+(reg-event-db
   :nation-ready
   (fn [data [_ nation]]
     (let [map (.-input js/map)]

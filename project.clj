@@ -10,10 +10,11 @@
 
   :source-paths ["src/clj" "src/cljc"]
 
-  :profiles {:dev {:dependencies [[org.clojure/clojurescript "0.0-MERGE-FIX"]
-                                  [re-frame "0.8.0-alpha2"]
-                                  [cljs-ajax "0.5.8"]
-                                  
+  :profiles {:dev {:dependencies [[org.clojure/clojurescript "1.9.229"]
+                                  [re-frame "0.8.0"]
+                                  [day8.re-frame/http-fx "0.0.4"]
+
+                                  [org.clojure/test.check "0.9.0"]
                                   [enlive "1.1.6"]
                                   [org.clojure/tools.cli "0.3.5"]
                                   [clj-http-lite "0.3.0"]
@@ -28,9 +29,9 @@
                    
                    :aliases {"initial-ingest" ["run" "-m" "western-music.ingest.run/initial-ingest"]}}
              
-             :compile-client {:dependencies [[org.clojure/clojurescript "0.0-MERGE-FIX"]
-                                             [re-frame "0.8.0-alpha2"]
-                                             [cljs-ajax "0.5.8"]]
+             :compile-client {:dependencies [[org.clojure/clojurescript "1.9.229"]
+                                             [re-frame "0.8.0"]
+                                             [day8.re-frame/http-fx "0.0.4"]]
                               
                               :cljsbuild {:builds {:client {:compiler {:main "western-music.core"
                                                                        :asset-path "js"
