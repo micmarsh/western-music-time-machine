@@ -8,6 +8,7 @@
             [clojure.spec :as s]
             [ajax.core :refer [GET]]
             [ajax.edn :as edn]
+            [youtube-fx.core]
             ;; implemenation-specific handlers
             [western-music.handlers.youtube]
             [western-music.handlers.map]))

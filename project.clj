@@ -14,13 +14,14 @@
                                   [re-frame "0.8.0"]
                                   [day8.re-frame/http-fx "0.0.4"]
 
+                                  [camel-snake-kebab "0.4.0"]
                                   [org.clojure/test.check "0.9.0"]
                                   [enlive "1.1.6"]
                                   [org.clojure/tools.cli "0.3.5"]
                                   [clj-http-lite "0.3.0"]
                                   [clj-time "0.5.0"]
                                   [cheshire "5.6.3"]]
-                   :cljsbuild {:builds {:client {:source-paths ["devsrc"]
+                   :cljsbuild {:builds {:client {:source-paths ["../re-frame-youtube-fx/src" "devsrc"]
                                                  :compiler     {:main "western-music.dev"
                                                                 :asset-path "js"
                                                                 :optimizations :none

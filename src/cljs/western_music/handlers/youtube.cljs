@@ -1,11 +1,13 @@
 (ns western-music.handlers.youtube
-  (:require [re-frame.core :refer [reg-event-db dispatch]]
-            [western-music.lib.ui :as ui]))
+  (:require [re-frame.core :refer [reg-event-fx]]
+            [western-music.lib.ui :as ui]
+            [youtube-fx.core]))
 
-(def player)
-
-(defn player-ready []
-  (println "player ready"))
+(reg-event-fx
+ :player-ready
+ (fn [_ _]
+   (println "player ready")
+   {}))
 
 (def ^:const +video-ended+ 0)
 (def ^:const +video-playing+ 1)
@@ -15,63 +17,54 @@
 
 (defmethod player-state-change +video-ended+
   [_]
-  (dispatch [:current-track-ended]))
+  {:dispatch [:current-track-ended]})
 
 (defmethod player-state-change +video-playing+
   [_]
-  (dispatch [:player-play]))
+  {:dispatch [:player-play]})
 
 (defmethod player-state-change +video-paused+
   [_]
-  (dispatch [:player-pause]))
+  {:dispatch [:player-pause]})
 
 (defmethod player-state-change :default
   [e]
-  (println "player state change" (.-data e)))
+  (println "player state change" (.-data e))
+  {})
 
-(def player-options
-  (clj->js
-   {:height "350"
-    :width "480"
-    :events {:onReady player-ready
-             :onStateChange player-state-change}}))
+(reg-event-fx
+ :player-state-change
+ (fn [_ [_ e]]
+   (player-state-change e)))
 
-(defn initialize [& _]
-  (if (boolean js/YouTubeReady)
-    (let [Player (.-Player js/YT)]
-      (set! player (Player. "youtube-player" player-options)))
-    (js/setTimeout initialize 1000)))
+(def ^:const player-options
+  {:height "350"
+   :width "480"
+   :events {:on-ready [:player-ready]
+            :on-state-change [:player-state-change]}})
 
-(reg-event-db
-  :initialize-player
-  (fn [data _]
-    (initialize)
-    data))
+(reg-event-fx
+ :initialize-player
+ (fn [_ _]
+   (if (boolean js/YouTubeReady)
+     {:youtube/initialize-player [:youtube-player player-options]}
+     {:dispatch-later [{:ms 1000 :dispatch [:initialize-player]}]})))
 
-(reg-event-db
-  :new-track-playing
-  (fn [data [_ {id :track/youtube-id} paused?]]
-    (when (nil? (.-loadVideoById player))) ;; TODO something elegant
-    ;; to handle figwheel reloading action
-    (if paused?
-      (.cueVideoById player id)
-      (.loadVideoById player id))
-    data))
+(reg-event-fx
+ :new-track-playing
+ (fn [_ [_ {id :track/youtube-id} paused?]]
+   (if paused?
+     {:youtube/cue-video-by-id id}
+     {:youtube/load-video-by-id id})))
 
-(reg-event-db
-  :current-track-playing
-  (fn [data _]
-    (.playVideo player)
-    data))
+(reg-event-fx
+ :current-track-playing
+ (constantly {:youtube/play-video nil}))
 
-(reg-event-db
-  :current-track-paused
-  (fn [data _]
-    (.pauseVideo player)
-    data))
+(reg-event-fx
+ :current-track-paused
+ (constantly {:youtube/pause-video nil}))
 
-(reg-event-db
-  :all-tracks-cleared
-  (fn [data _]
-    (.cueVideoById player "")
-    data))
+(reg-event-fx
+ :all-tracks-cleared
+ (constantly {:youtube/cue-video-by-id ""}))
