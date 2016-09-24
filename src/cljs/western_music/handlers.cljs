@@ -1,14 +1,13 @@
 (ns western-music.handlers
-  (:require [re-frame.core :refer [reg-event-db path after debug dispatch]]
+  (:require [re-frame.core :refer [reg-event-db reg-event-fx path after dispatch]]
             [western-music.lib.composition :as composition]
             [western-music.protocols :as p]
             [western-music.spec :as spec]
             [western-music.lib.ui :as ui]
             [western-music.util :as util]
             [clojure.spec :as s]
-            [ajax.core :refer [GET]]
+            [day8.re-frame.http-fx]
             [ajax.edn :as edn]
-            [youtube-fx.core]
             ;; implemenation-specific handlers
             [western-music.handlers.youtube]
             [western-music.handlers.map]))
@@ -20,17 +19,24 @@
        (str "?&_=")
        (str url)))
 
-(reg-event-db
+(reg-event-fx
   :initialize-data
   ui/verify-all-data
-  (fn [data _]
-    (GET (cache-bust "edn/compositions.edn")
-         {:handler (fn [initial-data]
-                     (doseq [composition initial-data]
-                       (dispatch [:new-composition-data composition])
-                       (dispatch [:nation-ready (composition/nation-id composition)])))
-          :response-format (edn/edn-response-format)})
-    ui/initial-data))
+  (fn [_ _]
+    {:db ui/initial-data
+     :http-xhrio {:method :get
+                  :uri (cache-bust "edn/compositions.edn")
+                  :body {}
+                  :response-format (edn/edn-response-format)
+                  :on-success [:compositions-from-server]}}))
+
+(reg-event-fx
+ :compositions-from-server
+ (fn [_ [_ data]]
+   {:dispatch-n
+    (mapcat (juxt (comp (partial vector :nation-ready) composition/nation-id)
+                  (partial vector :new-composition-data))
+            data)}))
 
 (reg-event-db
   :new-composition-data

@@ -54,17 +54,17 @@
  :new-track-playing
  (fn [_ [_ {id :track/youtube-id} paused?]]
    (if paused?
-     {:youtube/cue-video-by-id id}
-     {:youtube/load-video-by-id id})))
+     {:youtube/cue-video-by-id [:youtube-player id]}
+     {:youtube/load-video-by-id [:youtube-player id]})))
 
 (reg-event-fx
  :current-track-playing
- (constantly {:youtube/play-video nil}))
+ (constantly {:youtube/play-video :youtube-player}))
 
 (reg-event-fx
  :current-track-paused
- (constantly {:youtube/pause-video nil}))
+ (constantly {:youtube/pause-video :youtube-player}))
 
 (reg-event-fx
  :all-tracks-cleared
- (constantly {:youtube/cue-video-by-id ""}))
+ (constantly {:youtube/cue-video-by-id [:youtube-player ""]}))
