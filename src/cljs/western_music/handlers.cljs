@@ -72,10 +72,10 @@
           (ui/set-composer composer-id)))))
 
 ;; Track List and Queue manipulation
-(reg-event-db
+(reg-event-fx
   :play-track
   (path ui/player-path)
-  (fn [player [_ track-id]]
+  (fn [{player :db} [_ track-id]]
     (->> track-id
          (ui/player-track-lookup player)
          (ui/player-play-track player))))
@@ -93,58 +93,56 @@
   (fn [all-data [_ composer-id]]
     (ui/enqueue-composer all-data composer-id)))
 
-(reg-event-db
+(reg-event-fx
   :play-composer
-  (fn [all-data [_ composer-id]]
-    (-> all-data
-        (ui/enqueue-composer composer-id)
-        (update-in ui/player-path ui/player-play))))
+  (fn [{db :db} [_ composer-id]]
+    {:db (ui/enqueue-composer db composer-id)
+     :dispatch [:player-play]}))
 
 (reg-event-db
   :enqueue-nation
   (fn [all-data [_ nation-id]]
     (ui/enqueue-nation all-data nation-id)))
 
-(reg-event-db
+(reg-event-fx
   :play-nation
-  (fn [all-data [_ nation-id]]
-    (-> all-data
-        (ui/enqueue-nation nation-id)
-        (update-in ui/player-path ui/player-play))))
+  (fn [{db :db} [_ nation-id]]
+    {:db (ui/enqueue-nation db nation-id)
+     :dispatch [:player-play]}))
 
-(reg-event-db
+(reg-event-fx
   :dequeue-track
   [ui/verify-all-data (path ui/player-path)]
-  (fn [player [_ track-id]]
+  (fn [{player :db} [_ track-id]]
     (ui/player-dequeue-track player track-id)))
 
-(reg-event-db
+(reg-event-fx
   :clear-queue
   [ui/verify-all-data (path ui/player-path)]
-  (fn [player _] (ui/player-clear-queue player)))
+  (fn [{player :db} _] (ui/player-clear-queue player)))
 
 ;; Player Controls
-(reg-event-db
+(reg-event-fx
   :player-play
   [ui/verify-all-data (path ui/player-path)]
-  (fn [player _] (ui/player-play player)))
+  (fn [{player :db} _] (ui/player-play player)))
 
-(reg-event-db
+(reg-event-fx
   :player-pause
   (path ui/player-path)
-  (fn [player _] (ui/player-pause player)))
+  (fn [{player :db} _] (ui/player-pause player)))
 
-(reg-event-db
+(reg-event-fx
   :player-back
   [ui/verify-all-data (path ui/player-path)]
-  (fn [player _] (ui/player-back player)))
+  (fn [{player :db} _] (ui/player-back player)))
 
-(reg-event-db
+(reg-event-fx
   :player-forward
   [ui/verify-all-data (path ui/player-path)]
-  (fn [player _] (ui/player-forward player)))
+  (fn [{player :db} _] (ui/player-forward player)))
 
-(reg-event-db
+(reg-event-fx
   :current-track-ended
   (path ui/player-path)
-  (fn [player _] (ui/player-track-ended player)))
+  (fn [{player :db} _] (ui/player-track-ended player)))
