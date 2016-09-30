@@ -8,14 +8,6 @@
             [#?(:cljs cljs.spec.impl.gen
                 :clj clojure.spec.gen) :as gen]))
 
-#?(:clj
-   (do
-     (def fake-dispatch-results (atom []))
-     
-     (defn dispatch [arg]
-       (swap! fake-dispatch-results conj arg))
-     ))
-
 (s/def :data/raw (s/coll-of ::spec/composition))
 
 (s/def :data/ui 
@@ -42,15 +34,7 @@
          (fn [{playing :player/playing q :player/queue}]
            (if playing
              (contains? (into #{} (map :track/id) q) (:track/id playing))
-             true)))
-  #_(s/with-gen
-
-    #(gen/fmap (fn [{playing :player/playing q :player/queue :as p}]
-                 (if playing
-                   (assoc p :player/playing (first q))
-                   p))
-               ;; TODO some separate, unchecked stuff, as seen with compositions
-               )))
+             true))))
 
 (s/def :player/paused boolean?)
 
@@ -64,10 +48,8 @@
 
 (def all-data-spec (s/keys :req [:data/raw :data/ui]))
 
-#?(:cljs
-   (def verify-all-data
-     (after (partial spec/verify all-data-spec)))
-   )
+(def verify-all-data
+ (after (partial spec/verify all-data-spec)))
 
 (def ^:const blank
   #:ui{:player #:player{:queue []
