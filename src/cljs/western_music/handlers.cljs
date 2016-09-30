@@ -93,24 +93,22 @@
   (fn [all-data [_ composer-id]]
     (ui/enqueue-composer all-data composer-id)))
 
-(reg-event-db
+(reg-event-fx
   :play-composer
-  (fn [all-data [_ composer-id]]
-    (-> all-data
-        (ui/enqueue-composer composer-id)
-        (update-in ui/player-path ui/player-play))))
+  (fn [{db :db} [_ composer-id]]
+    {:db (ui/enqueue-composer db composer-id)
+     :dispatch [:player-play]}))
 
 (reg-event-db
   :enqueue-nation
   (fn [all-data [_ nation-id]]
     (ui/enqueue-nation all-data nation-id)))
 
-(reg-event-db
+(reg-event-fx
   :play-nation
-  (fn [all-data [_ nation-id]]
-    (-> all-data
-        (ui/enqueue-nation nation-id)
-        (update-in ui/player-path ui/player-play))))
+  (fn [{db :db} [_ nation-id]]
+    {:db (ui/enqueue-nation db nation-id)
+     :dispatch [:player-play]}))
 
 (reg-event-fx
   :dequeue-track
