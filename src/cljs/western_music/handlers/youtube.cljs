@@ -3,12 +3,6 @@
             [western-music.lib.ui :as ui]
             [youtube-fx.core]))
 
-(reg-event-fx
- :player-ready
- (fn [_ _]
-   (println "player ready")
-   {}))
-
 (def ^:const +video-ended+ 0)
 (def ^:const +video-playing+ 1)
 (def ^:const +video-paused+ 2)
@@ -40,8 +34,7 @@
 (def ^:const player-options
   {:height "350"
    :width "480"
-   :events {:on-ready [:player-ready]
-            :on-state-change [:player-state-change]}})
+   :events {:on-state-change [:player-state-change]}})
 
 (reg-event-fx
  :initialize-player
