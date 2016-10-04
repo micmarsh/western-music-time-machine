@@ -13,3 +13,9 @@
                  :track/title
                  :track/youtube-id
                  :track/id]))
+
+(defn minimal
+  "Returns a minimal (non-spec passing) map of a track"
+  [artist composition-name]
+  #:track{:artist artist
+          :title composition-name})

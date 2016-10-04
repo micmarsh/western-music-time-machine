@@ -1,25 +1,19 @@
 (ns western-music.ingest.track
-  (:require [western-music.ingest.html :as title]
-            ;; ^ TODO as hinted at by alias, bad name/place for these fns
-            [western-music.ingest.bio :as bio]
+  (:require [western-music.ingest.bio.wikidata :as wiki]
             [western-music.ingest.fetch :refer [apply-spec]]
             [western-music.ingest.youtube.search :as yt]
-            [western-music.lib.composition :as comp]
+            [western-music.lib
+             [composition :as comp]
+             [track :as track]]
             [western-music.spec :as spec]
             [clojure.spec :as s]))
 
-(def formatted-title (partial format ". %s - %s"))
-
 (def ^:const bio-fetch-spec
-  {::spec/composer #:composer{:birth bio/fetch-spec}})
-
-(defn complete-biography [minimal-data]
-  (-> minimal-data
-      (apply-spec bio-fetch-spec)
-      (assoc-in [::spec/composer :composer/birth :place/type] :place/city)
-      (assoc-in [::spec/composer :composer/birth :time/type] :time/year)))
-
-(def minimal-data (comp title/parse-title formatted-title))
+  {::spec/composer #:composer{:birth {:place/nation wiki/lookup-nation
+                                      :place/city wiki/lookup-city
+                                      :time/year wiki/lookup-year
+                                      :place/type :place/city
+                                      :time/type :time/year}}})
 
 (defn full-composition [{:keys [yt-api-key
                                 new-composition-id
@@ -28,13 +22,13 @@
                               new-composition-id -1}}
                         artist composition-name]
   (assert (not (nil? yt-api-key)) "Need YouTube API Key")
-  (->> (minimal-data artist composition-name)
-       (complete-biography)
-       (#(comp/add-track % (yt/youtube-track yt-api-key new-track-id
-                                             #:track{:artist artist
-                                                     :title composition-name})))
-       (#(assoc % :composition/id new-composition-id))
-       (spec/verify ::spec/composition)))
+  (spec/verify
+   ::spec/composition
+   (-> (comp/minimal artist composition-name)
+       (apply-spec bio-fetch-spec)
+       (comp/add-track (yt/youtube-track yt-api-key new-track-id
+                                         (comp/track artist composition-name)))
+       (assoc :composition/id new-composition-id))))
 
 
 (defn add-new-composition

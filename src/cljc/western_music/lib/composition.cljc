@@ -51,3 +51,9 @@
        (mapcat :composition/tracks)
        (map :track/id)
        (apply max)))
+
+(defn minimal
+  "Returns a minimal (non-spec passing) map of a composition"
+  [artist composition-name]
+  {:composition/name composition-name
+   ::spec/composer artist})
