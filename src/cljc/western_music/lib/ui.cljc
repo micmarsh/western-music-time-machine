@@ -175,12 +175,14 @@
 (def player-at-beginning? (comp zero? player-index))
 
 (defn player-back [{q :player/queue paused? :player/paused :as p}]
-  (cond-> p
+  (cond-> (m/return p)
+    true (m/fmap assoc :player/selected-tab :queue)
     (not (player-at-beginning? p)) (m/bind player-set-playing (q (dec (player-index p))) paused?)))
 
 (defn player-forward
   [{q :player/queue paused? :player/paused :as p}]
   (cond-> (m/return p)
+    true (m/fmap assoc :player/selected-tab :queue)
     (not (player-at-end? p)) (m/bind player-set-playing (q (inc (player-index p))) paused?)))
 
 (defn currently-playing? [player track-id]
