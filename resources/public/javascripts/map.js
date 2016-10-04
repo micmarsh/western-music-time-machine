@@ -54,9 +54,11 @@ map.initialize = function () {
     // Detect if the browser is IE.
     var IE = $.browser.msie ? true : false;
 
+    var cacheBust = (new Date).getTime();
+    
     $.ajax({
         type: 'GET',
-        url: 'xml/settings.xml',
+        url: 'xml/settings.xml?_=' + cacheBust,
         dataType: $.browser.msie ? 'text' : 'xml',
         success: function (data) {
 
