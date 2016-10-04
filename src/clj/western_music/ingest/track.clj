@@ -9,11 +9,11 @@
             [clojure.spec :as s]))
 
 (def ^:const bio-fetch-spec
-  {::spec/composer #:composer{:birth {:place/nation wiki/lookup-nation
-                                      :place/city wiki/lookup-city
-                                      :time/year wiki/lookup-year
-                                      :place/type :place/city
-                                      :time/type :time/year}}})
+  {::spec/composer {:composer/birth {:place/nation wiki/lookup-nation
+                                     :place/city wiki/lookup-city
+                                     :time/year wiki/lookup-year
+                                     :place/type :place/city
+                                     :time/type :time/year}}})
 
 (defn full-composition [{:keys [yt-api-key
                                 new-composition-id
@@ -27,7 +27,7 @@
    (-> (comp/minimal artist composition-name)
        (apply-spec bio-fetch-spec)
        (comp/add-track (yt/youtube-track yt-api-key new-track-id
-                                         (comp/track artist composition-name)))
+                                         (track/minimal artist composition-name)))
        (assoc :composition/id new-composition-id))))
 
 

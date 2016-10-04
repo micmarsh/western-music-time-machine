@@ -56,4 +56,4 @@
   "Returns a minimal (non-spec passing) map of a composition"
   [artist composition-name]
   {:composition/name composition-name
-   ::spec/composer artist})
+   ::spec/composer {:composer/name artist}})
