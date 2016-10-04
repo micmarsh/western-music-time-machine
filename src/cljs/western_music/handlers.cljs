@@ -44,17 +44,19 @@
   (fn [raw-data [_ composition]]
     (ui/new-composition raw-data composition)))
 
-(defn set-value-handler [_ [_ value]] value)
-
 (reg-event-db
   :focus-nation
-  (path ui/nation-focus-path)
-  set-value-handler)
+  (path :data/ui)
+  (fn [ui [_ nation]]
+    (ui/focus-nation ui nation)))
 
 (reg-event-db
   :select-nation
-  (path ui/nation-selected-path)
-  set-value-handler)
+  (path :data/ui)
+  (fn [ui [_ nation]]
+    (-> ui
+        (ui/select-nation nation)
+        (ui/set-tab :selection))))
 
 (reg-event-db
   :select-blank

@@ -229,6 +229,12 @@
 (defn set-tab [ui tab]
   (assoc ui :ui/selected-tab tab))
 
+(defn focus-nation [ui nation]
+  (assoc-in ui [:ui/nation :ui.nation/mouse-on] nation))
+
+(defn select-nation [ui nation]
+  (assoc-in ui [:ui/nation :ui.nation/selected] nation))
+
 (def selected-tab :ui/selected-tab)
 
 (def composer :ui/composer)
