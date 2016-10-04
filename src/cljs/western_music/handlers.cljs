@@ -146,3 +146,10 @@
   :current-track-ended
   (path ui/player-path)
   (fn [{player :db} _] (ui/player-track-ended player)))
+
+
+(reg-event-db
+ :select-tab
+ (path :data/ui)
+ (fn [db [_ tab]]
+   (ui/set-tab db tab)))

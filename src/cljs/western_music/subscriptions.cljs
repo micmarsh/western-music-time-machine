@@ -96,3 +96,9 @@
   :<- [:player]
   (fn [player _]
     (ui/player-paused? player)))
+
+(reg-sub
+ :selected-tab
+ :<- [:ui-state]
+ (fn [ui _]
+   (ui/selected-tab ui)))

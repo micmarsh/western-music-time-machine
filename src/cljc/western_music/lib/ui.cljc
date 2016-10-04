@@ -14,7 +14,10 @@
 (s/def :data/ui 
   (s/keys :req [:ui/player
                 :ui/nation
-                :ui/composer]))
+                :ui/composer
+                :ui/selected-tab]))
+
+(s/def :ui/selected-tab #{:selection :queue})
 
 (s/def :ui/nation
   (s/keys :req [:ui.nation/mouse-on
@@ -58,6 +61,7 @@
                         :paused true
                         :playing nil
                         :shuffle-memory nil}
+       :selected-tab :selection
        :nation #:ui.nation{:mouse-on nil
                            :selected nil}
        :composer nil})
@@ -221,6 +225,11 @@
 (defn selected-nation [ui]
   (or (:ui.nation/selected (:ui/nation ui))
       (:ui.nation/mouse-on (:ui/nation ui))))
+
+(defn set-tab [ui tab]
+  (assoc ui :ui/selected-tab tab))
+
+(def selected-tab :ui/selected-tab)
 
 (def composer :ui/composer)
 
