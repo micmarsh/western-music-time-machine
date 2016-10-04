@@ -13,6 +13,7 @@
   :profiles {:dev {:dependencies [[org.clojure/clojurescript "1.9.229"]
                                   [re-frame "0.8.0"]
                                   [day8.re-frame/http-fx "0.0.4"]
+                                  [re-frame-youtube-fx "0.1.1"]
 
                                   [camel-snake-kebab "0.4.0"]
                                   [org.clojure/test.check "0.9.0"]
@@ -21,7 +22,7 @@
                                   [clj-http-lite "0.3.0"]
                                   [clj-time "0.5.0"]
                                   [cheshire "5.6.3"]]
-                   :cljsbuild {:builds {:client {:source-paths ["../re-frame-youtube-fx/src" "devsrc"]
+                   :cljsbuild {:builds {:client {:source-paths ["devsrc"]
                                                  :compiler     {:main "western-music.dev"
                                                                 :asset-path "js"
                                                                 :optimizations :none
@@ -32,7 +33,8 @@
              
              :compile-client {:dependencies [[org.clojure/clojurescript "1.9.229"]
                                              [re-frame "0.8.0"]
-                                             [day8.re-frame/http-fx "0.0.4"]]
+                                             [day8.re-frame/http-fx "0.0.4"]
+                                             [re-frame-youtube-fx "0.1.1"]]
                               
                               :cljsbuild {:builds {:client {:compiler {:main "western-music.core"
                                                                        :asset-path "js"
