@@ -108,17 +108,32 @@
          (icon #(dispatch [:player-pause]) "pause"))
        (icon #(dispatch [:player-forward]) "skip_next")])))
 
+(def selected-tab-attrs
+  {:style {:background "#fff"
+           :border-bottom "1px solid #fff"}})
+
 (defn track-tabs []
-  (let [q (subscribe [:track-queue])]
+  (let [q (subscribe [:track-queue])
+        selected-tab (subscribe [:selected-tab])]
     (fn []
       [:div#tabs
+       
        [:input#selection-tab {:type "radio" :name "grp"}]
-       [:label {:for "selection-tab"} "Selection"]
-       [:div.tab-content [selection-list]]
+       [:label (merge
+                {:for "selection-tab"
+                 :on-click #(dispatch [:select-tab :selection])}
+                (when (= :selection @selected-tab) selected-tab-attrs)) "Selection"]
+       (when (= :selection @selected-tab)
+         [:div.tab-content [selection-list]])
+       
        [:input#queue-tab {:type "radio" :name "grp"}]
-       [:label {:for "queue-tab"}
+       [:label (merge
+                {:for "queue-tab"
+                 :on-click #(dispatch [:select-tab :queue])}
+                (when (= :queue @selected-tab) selected-tab-attrs))
         (str "Play Queue" (when-not (empty? @q) (str " (" (count @q) ")")))]
-       [:div.tab-content [track-queue]]])))
+       (when (= :queue @selected-tab)
+         [:div.tab-content [track-queue]])])))
 
 (defn wmtm-app []
   [:div#app-body

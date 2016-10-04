@@ -19,7 +19,6 @@
   (reagent/render [wmtm-app] (.getElementById js/document "app")
                   (fn []
                     (set-map-listeners!)
-                    (.click (js/$ "#selection-tab"))
                     (.initialize js/map)
                     (dispatch [:initialize-data])
                     (dispatch [:initialize-player]))))

@@ -241,23 +241,22 @@ div #tabs label:first-of-type {
     -webkit-order: 1;
     order: 1;
     font-size:16px;
-    
-}
-
-div #tabs input[type=radio],
-.tab-content {
-  display: none;
-}
-
-div #tabs input[type=radio]:checked + label {
-    background: #fff;
-    border-bottom: 1px solid #fff;
-}
-
-div #tabs input[type=radio]:checked + label + div {
-    display: block;
     background: #fff;
 }
+
+div #tabs input[type=radio] {
+    display: none;
+}
+
+/* div #tabs input[type=radio]:checked + label { */
+/*     background: #fff; */
+/*     border-bottom: 1px solid #fff; */
+/* } */
+
+/* div #tabs input[type=radio]:checked + label + div { */
+/*     display: block; */
+/*     background: #fff; */
+/* } */
 
 .track-list-item {
     display: flex;

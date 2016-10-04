@@ -1,24 +1,24 @@
 (ns western-music.subscriptions
-  (:require [re-frame.core :refer [def-sub]]
+  (:require [re-frame.core :refer [reg-sub]]
             [western-music.lib.composition :as composition]
             [western-music.lib.ui :as ui]
             [western-music.util :as util]
             [western-music.protocols :as p]))
 
-(def-sub
+(reg-sub
   :raw-data
   (fn [data _] (:data/raw data)))
 
-(def-sub
+(reg-sub
   :ui-state
   (fn [data _] (:data/ui data)))
 
-(def-sub
+(reg-sub
   :selected-nation
   :<- [:ui-state]
   (fn [ui _] (ui/selected-nation ui)))
 
-(def-sub
+(reg-sub
   :all-nations
   :<- [:raw-data]
   (fn [data _]
@@ -30,7 +30,7 @@
 (defn ->already-queued? [queue]
   (comp (set (map :track/id queue)) :track/id))
 
-(def-sub
+(reg-sub
   :selected-composers
   :<- [:selected-nation]
   :<- [:raw-data]
@@ -43,7 +43,7 @@
                           (distinct))
                  data)))))
 
-(def-sub
+(reg-sub
   :selected-composer
   :<- [:ui-state]
   (fn [ui _] (ui/composer ui)))
@@ -56,7 +56,7 @@
     (display [_] (:track/title track))
     (id [_] (:track/id track))))
 
-(def-sub
+(reg-sub
   :selected-tracks
   :<- [:ui-state]
   (fn [ui _] 
@@ -66,7 +66,7 @@
                      (map display-track-no-composer))
             (ui/track-list ui)))))
 
-(def-sub
+(reg-sub
   :player
   :<- [:ui-state]
   (fn [ui _] (ui/player ui)))
@@ -79,20 +79,26 @@
       (str (:track/artist track) " - " (:track/title track)))
     (id [_] (:track/id track))))
 
-(def-sub
+(reg-sub
   :track-queue
   :<- [:player]
   (fn [player _]
     (mapv display-track (ui/player-queue player))))
 
-(def-sub
+(reg-sub
   :current-track
   :<- [:player]
   (fn [player _]
     (display-track (ui/player-playing player))))
 
-(def-sub
+(reg-sub
   :paused?
   :<- [:player]
   (fn [player _]
     (ui/player-paused? player)))
+
+(reg-sub
+ :selected-tab
+ :<- [:ui-state]
+ (fn [ui _]
+   (ui/selected-tab ui)))
