@@ -14,10 +14,7 @@
 (s/def :data/ui 
   (s/keys :req [:ui/player
                 :ui/nation
-                :ui/composer
-                :ui/selected-tab]))
-
-(s/def :ui/selected-tab #{:selection :queue})
+                :ui/composer]))
 
 (s/def :ui/nation
   (s/keys :req [:ui.nation/mouse-on
@@ -34,7 +31,8 @@
                        :player/track-list
                        :player/paused
                        :player/playing
-                       :player/shuffle-memory])
+                       :player/shuffle-memory
+                       :player/selected-tab])
          (fn [{playing :player/playing q :player/queue}]
            (if playing
              (contains? (into #{} (map :track/id) q) (:track/id playing))
@@ -50,6 +48,8 @@
 
 (s/def :player/playing (s/nilable ::spec/track))
 
+(s/def :player/selected-tab #{:selection :queue})
+
 (def all-data-spec (s/keys :req [:data/raw :data/ui]))
 
 (def verify-all-data
@@ -60,8 +60,8 @@
                         :track-list []
                         :paused true
                         :playing nil
-                        :shuffle-memory nil}
-       :selected-tab :selection
+                        :shuffle-memory nil
+                        :selected-tab :selection}       
        :nation #:ui.nation{:mouse-on nil
                            :selected nil}
        :composer nil})
@@ -227,7 +227,7 @@
       (:ui.nation/mouse-on (:ui/nation ui))))
 
 (defn set-tab [ui tab]
-  (assoc ui :ui/selected-tab tab))
+  (assoc-in ui [:ui/player :player/selected-tab] tab))
 
 (defn focus-nation [ui nation]
   (assoc-in ui [:ui/nation :ui.nation/mouse-on] nation))
@@ -235,7 +235,7 @@
 (defn select-nation [ui nation]
   (assoc-in ui [:ui/nation :ui.nation/selected] nation))
 
-(def selected-tab :ui/selected-tab)
+(def selected-tab (comp :player/selected-tab :ui/player))
 
 (def composer :ui/composer)
 
