@@ -98,7 +98,9 @@
 (reg-event-fx
   :play-composer
   (fn [{db :db} [_ composer-id]]
-    {:db (ui/enqueue-composer db composer-id)
+    {:db (-> db
+             (ui/enqueue-composer composer-id)
+             (update :data/ui ui/set-tab :queue))
      :dispatch [:player-play]}))
 
 (reg-event-db
@@ -109,7 +111,9 @@
 (reg-event-fx
   :play-nation
   (fn [{db :db} [_ nation-id]]
-    {:db (ui/enqueue-nation db nation-id)
+    {:db (-> db
+             (ui/enqueue-nation nation-id)
+             (update :data/ui ui/set-tab :queue))
      :dispatch [:player-play]}))
 
 (reg-event-fx
