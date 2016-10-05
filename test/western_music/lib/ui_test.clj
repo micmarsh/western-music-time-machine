@@ -25,6 +25,21 @@
       (is (= (map :track/id @sample-tracks)
              (map :track/id queue))))))
 
+(defn player-calls-to-end [f player-fx]
+  (rest (reductions (fn [{player :db} _] (f player))
+                    player-fx
+                    (:player/queue (:db player-fx)))))
+
+(defn check-current-track [expected-track fx paused?]
+  (is (= expected-track (:player/playing (:db fx))))
+  (is (= paused? (:player/paused (:db fx))))
+  (is (= :queue (:player/selected-tab (:db fx))))
+  (is (= [:new-track-playing expected-track paused?] (:dispatch fx))))
+
+(defn check-last-fx [fxs]
+  (is (= 1 (count (last fxs))) "no extra effects on last call")
+  (is (= (:db (last fxs)) (:db (last (drop-last fxs)))) "data state not changed on last call"))
+
 (deftest test-player-controls
   (testing "Nothing Enqueued"
     (let [player (get-in @sample-data ui/player-path)]
@@ -52,33 +67,34 @@
               "Currently playing didn't change at all")))
 
       (testing "Forward and Backwards"
+
         (testing "forward while playing"
-          (let [forwards (rest (reductions (fn [{player :db} _] (ui/player-forward player))
-                                           playing-fx
-                                           (:player/queue (:db playing-fx))))]
+          (let [forwards (player-calls-to-end ui/player-forward playing-fx)]
             (doseq [[expected-track fx index] (map vector (rest tracks) (drop-last forwards) (range))]
               (testing (str "call number " (inc index))
-                (is (= expected-track (:player/playing (:db fx))))
-                (is (false? (:player/paused (:db fx))))
-                (is (= :queue (:player/selected-tab (:db fx))))
-                (is (= [:new-track-playing expected-track false] (:dispatch fx)))))
-            (is (= 1 (count (last forwards)))
-                "No extra effects on last call")
-            (is (= (:db (last forwards)) (:db (last (drop-last forwards))))
-                "Forwarding when on last track doesn't change player state")))
+                (check-current-track expected-track fx false)))
+            (check-last-fx forwards)
+            
+            (testing "back while playing"
+              (let [player-fx (last forwards)
+                    backs (player-calls-to-end ui/player-back player-fx)]
+                (doseq [[expected-track fx index] (map vector (rest (reverse tracks)) (drop-last backs) (range))]
+                  (testing (str "call number " (inc index))
+                    (check-current-track expected-track fx false)))
+                (check-last-fx backs)))))
         
         (testing "forward while paused"
           (let [paused-fx (ui/player-pause (:db playing-fx))
-                forwards (rest (reductions (fn [{player :db} _] (ui/player-forward player))
-                                           paused-fx
-                                           (:player/queue (:db paused-fx))))]
+                forwards (player-calls-to-end ui/player-forward paused-fx)]
             (doseq [[expected-track fx index] (map vector (rest tracks) (drop-last forwards) (range))]
               (testing (str "call number " (inc index))
-                (is (= expected-track (:player/playing (:db fx))))
-                (is (true? (:player/paused (:db fx))))
-                (is (= :queue (:player/selected-tab (:db fx))))
-                (is (= [:new-track-playing expected-track true] (:dispatch fx)))))
-            (is (= 1 (count (last forwards)))
-                "No extra effects on last call")
-            (is (= (:db (last forwards)) (:db (last (drop-last forwards))))
-                "Forwarding when on last track doesn't change player state")))))))
+                (check-current-track expected-track fx true)))
+            (check-last-fx forwards)
+            
+            (testing "back while paused"
+              (let [player-fx (last forwards)
+                    backs (player-calls-to-end ui/player-back player-fx)]
+                (doseq [[expected-track fx index] (map vector (rest (reverse tracks)) (drop-last backs) (range))]
+                  (testing (str "call number " (inc index))
+                    (check-current-track expected-track fx true)))
+                (check-last-fx backs)))))))))
