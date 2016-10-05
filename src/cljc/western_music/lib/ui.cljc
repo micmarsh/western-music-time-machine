@@ -151,11 +151,11 @@
 (defn player-play [player] 
   (let [q (:player/queue player)]
     (if (zero? (count q))
-      {m/return player}
+      (m/return player)
       (cond-> (m/return player)
         (nil? (:player/playing player)) (m/bind player-set-playing (first q))
-        true (m/fmap assoc :player/paused false)
-        true (m/bind (fn [p] {:db p :dispatch [:current-track-playing]}))))))
+        (some? (:player/playing player)) (m/bind (fn [p] {:db p :dispatch [:current-track-playing]}))
+        true (m/fmap assoc :player/paused false)))))
 
 (defn player-pause [player]  
   {:db (assoc player :player/paused true)

@@ -6,9 +6,11 @@
 
 (defn merge-events [fx1 fx2]
   (let [events (concat (keep :dispatch [fx1 fx2]) (mapcat :dispatch-n [fx1 fx2]))]
-    (if-not (empty? events)
-      {:dispatch-n events}
-      {})))
+    (cond (empty? events) {}
+          (= 1 (count events)) {:dispatch (first events)}
+          :else {:dispatch-n events})))
+
+;; TODO could TDD up proper dispatch-later merging
 
 (defn bind [fx db-f & args]
     (let [new-fx (apply db-f (:db fx) args)]
