@@ -15,24 +15,16 @@
 (def sample-tracks
   (delay (map comp/track (:data/raw @sample-data))))
 
+(defn enqueue-tracks-directly [data tracks]
+  (update-in data ui/player-path #(reduce ui/player-enqueue-track % tracks)))
+
 (deftest test-play
   (testing "Nothing Enqueued"
     (let [player (get-in @sample-data ui/player-path)]
       (is (= {:db player} (ui/player-play player)))))
   (testing "With Enqueued"
     (let [tracks (into [] (take 5) @sample-tracks)
-          with-tracklist (assoc-in @sample-data (conj ui/player-path :player/track-list) tracks)
-          with-enqueued (update-in with-tracklist ui/player-path
-                                   #(reduce (fn [player track-id]
-                                              (->> track-id
-                                                   (ui/player-track-lookup player)
-                                                   (ui/player-enqueue-track player)))
-                                            % (map :track/id tracks))
-                                   ;; TODO wew lad, can do better than
-                                   ;; that^. Prolly a little refactor
-                                   ;; action in the real code, too
-                                   ;; (then can test!)
-                                   )
+          with-enqueued (enqueue-tracks-directly @sample-data tracks)
           player (get-in with-enqueued ui/player-path)
           with-playing (ui/player-play player)]
       (is (= (first tracks) (:player/playing (:db with-playing))))
