@@ -12,10 +12,23 @@
 
 ;; TODO could TDD up proper dispatch-later merging
 
+(def ^:const events-keys [:dispatch :dispatch-n])
+
+(defn fx= [& fxs]
+  (let [all-events (for [fx fxs]
+                     (if-let [event (:dispatch fx)]
+                       (cons event (:dispatch-n fx))
+                       (:dispatch-n fx)))]
+    (doseq [events all-events]
+      (assert (= (count events) (count (set events)))
+              "Can't properly compare with \"duplicate\" events present"))
+    (and (apply = (map set all-events))
+         (apply = (map #(apply dissoc % events-keys) fxs)))))
+
 (defn bind [fx db-f & args]
     (let [new-fx (apply db-f (:db fx) args)]
       (-> fx
           (merge-events new-fx)
-          (merge (dissoc new-fx :dispatch :dispatch-n)))))
+          (merge (apply dissoc new-fx events-keys)))))
 
 (defn fmap [fx db-f & args] (apply update fx :db db-f args))
