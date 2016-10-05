@@ -11,7 +11,8 @@
 
 (defn transform [db new-name]
   {:db (assoc db :name new-name)
-   :dispatch [:new-name new-name]})
+   :dispatch [:new-name new-name]
+   :dispatch-later [{:ms 1000 :dispatch [:some-stuff new-name]}]})
 
 (deftest test-fx=
   (is (m/fx= effects
