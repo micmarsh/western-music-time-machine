@@ -148,14 +148,14 @@
 (defn remove-track [coll track-id]
   (into [] (remove (comp #{track-id} :track/id)) coll))
 
-(defn player-play [player] 
+(defn player-play [player] reductions
   (let [q (:player/queue player)]
     (if (zero? (count q))
-      {m/return player}
+      (m/return player)
       (cond-> (m/return player)
         (nil? (:player/playing player)) (m/bind player-set-playing (first q))
-        true (m/fmap assoc :player/paused false)
-        true (m/bind (fn [p] {:db p :dispatch [:current-track-playing]}))))))
+        (some? (:player/playing player)) (m/bind (fn [p] {:db p :dispatch [:current-track-playing]}))
+        true (m/fmap assoc :player/paused false)))))
 
 (defn player-pause [player]  
   {:db (assoc player :player/paused true)
@@ -201,7 +201,7 @@
       (and (currently-playing? player track-id) (player-at-end? player)) (m/bind player-back)
       (and (currently-playing? player track-id) (not (player-at-end? player))) (m/bind player-forward)
       empty (m/bind player-clear-queue)
-      true (m/fmap assoc :player/queue q))))
+      (not empty) (m/fmap assoc :player/queue q))))
 
 (defn player-track-ended
   [{ended :player/playing :as p}]

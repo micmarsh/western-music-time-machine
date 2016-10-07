@@ -20,23 +20,9 @@
 (defn search-title [t]
   (str (:track/artist t) " " (:track/title t)))
 
-(def new-ids (atom 0))
-
 (defn youtube-track [api-key new-id track]
   (let [search-term (search-title track)]
     (-> track
         (assoc :track/type :track/youtube)
         (assoc :track/youtube-id (id (body (search api-key search-term))))
         (assoc :track/id new-id))))
-
-(comment
-  (require '[western-music.data :refer [initial-data]]
-           '[western-music.lib.composition :as comp])
-
-  (def with-youtube
-    (map (fn [comp]
-           (verify :western-music.spec/composition
-                   (comp/add-track comp (youtube-track API_KEY (+ 200 (swap! new-ids inc)) (comp/track comp)))))
-         initial-data))
-  
-  )

@@ -29,13 +29,3 @@
   (-> (util/merge-recursive data spec)
       (apply-lookups)
       (resolve-results)))
-
-(comment
-  (defn get-hello [data]
-    (str "hello, " (:name data)))
-  
-  (apply-spec {:name "Ludwig"} {:greeting {:greet-with get-hello
-                                           :same-greeting #'get-hello
-                                           :var-gretting `get-hello}
-                                :place (constantly (future "async place"))})
-  )
