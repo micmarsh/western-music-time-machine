@@ -1226,9 +1226,8 @@ for(var f in paths){var p=l.path(paths[f].path)
 p.attr(c),u[p.id]=f,n(p),y[h[p.id]]=p}map.input.activateNation=function(t){var n=y[t]
 n?e(n):console.log("No nation found for ",t)},map.input.isActivated=function(t){var e=y[t]
 return!!e&&e.active},map.paper=l,r(o,s)}function n(t){var e=$(window).scrollTop()
-t&&t.pageX?(x=t.pageX,b=t.pageY-e):(x=event.clientX+document.body.scrollLeft,b=event.clientY+document.body.scrollTop),x<0&&(x=0),b<0&&(b=0),$("#map").next(".point").css({left:x-50,top:b-70})}function r(t,e){map.paper.changeSize(t,e,!0,!1),"true"==l?$(".mapWrapper").css({width:parseFloat(t,10)+parseFloat(c,10)+"px",height:e+"px"}):$(".mapWrapper").css({width:t+"px",height:e+"px"})}var i,a,o,s,l,c,u,h=new Array,f=new Array,p=new Array,d=new Array,m=new Array,g=new Array,v=new Array,y={},x=0,b=0,w=null
-!!$.browser.msie
-$.ajax({type:"GET",url:"xml/settings.xml",dataType:$.browser.msie?"text":"xml",success:function(t){var n
+t&&t.pageX?(x=t.pageX,b=t.pageY-e):(x=event.clientX+document.body.scrollLeft,b=event.clientY+document.body.scrollTop),x<0&&(x=0),b<0&&(b=0),$("#map").next(".point").css({left:x-50,top:b-70})}function r(t,e){map.paper.changeSize(t,e,!0,!1),"true"==l?$(".mapWrapper").css({width:parseFloat(t,10)+parseFloat(c,10)+"px",height:e+"px"}):$(".mapWrapper").css({width:t+"px",height:e+"px"})}var i,a,o,s,l,c,u,h=new Array,f=new Array,p=new Array,d=new Array,m=new Array,g=new Array,v=new Array,y={},x=0,b=0,w=null,_=(!!$.browser.msie,(new Date).getTime())
+$.ajax({type:"GET",url:"xml/settings.xml?_="+_,dataType:$.browser.msie?"text":"xml",success:function(t){var n
 $.browser.msie?(n=new ActiveXObject("Microsoft.XMLDOM"),n.async=!1,n.loadXML(t)):n=t
 var r=$(n)
 i="#"+r.find("mapSettings").attr("offColor"),a="#"+r.find("mapSettings").attr("strokeColor"),o=r.find("mapSettings").attr("mapWidth"),s=r.find("mapSettings").attr("mapHeight"),l=r.find("mapSettings").attr("useSideText"),c=r.find("mapSettings").attr("textAreaWidth"),u=r.find("mapSettings").attr("textAreaPadding"),"true"==l&&($("#text").css({width:parseFloat(c)-parseFloat(2*u)+"px",height:parseFloat(s)-parseFloat(2*u)+"px",display:"inline",float:"right",padding:u+"px"}),$("#text").html(r.find("defaultSideText").text())),r.find("stateData").each(function(t){var e=$(this)
