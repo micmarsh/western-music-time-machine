@@ -98,3 +98,18 @@
                   (testing (str "call number " (inc index))
                     (check-current-track expected-track fx true)))
                 (check-last-fx backs)))))))))
+
+(deftest test-dequeing-tracks
+  (let [tracks (take 15 @sample-tracks)
+        track-ids (map :track/id tracks)
+        with-enqueued (enqueue-tracks-directly @sample-data tracks)
+        player (get-in with-enqueued ui/player-path)
+        player-playing (:db (ui/player-play player))]
+    (testing "While playing"
+      (testing "dequeuing single track"
+        (let [dequeued-fx (ui/player-dequeue-track player-playing (first track-ids)) 
+              new-player (:db dequeued-fx)]
+          (is (= (count (:player/queue new-player))
+                (dec (count (:player/queue player-playing))))
+              "Actually removes a track")
+          (check-current-track (second tracks) dequeued-fx false))))))
