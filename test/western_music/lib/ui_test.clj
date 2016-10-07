@@ -105,6 +105,7 @@
         with-enqueued (enqueue-tracks-directly @sample-data tracks)
         player (get-in with-enqueued ui/player-path)
         player-playing (:db (ui/player-play player))]
+    
     (testing "While playing"
       (testing "dequeuing single track"
         (let [dequeued-fx (ui/player-dequeue-track player-playing (first track-ids)) 
@@ -112,4 +113,31 @@
           (is (= (count (:player/queue new-player))
                 (dec (count (:player/queue player-playing))))
               "Actually removes a track")
-          (check-current-track (second tracks) dequeued-fx false))))))
+          (check-current-track (second tracks) dequeued-fx false)))
+      
+      (testing "dequeuing last track"
+        (let [to-end-fx (player-calls-to-end ui/player-forward {:db player-playing})
+              player-at-end (:db (last to-end-fx))             
+              dequeued-fx (ui/player-dequeue-track player-at-end (last track-ids))
+              new-player (:db dequeued-fx)]
+          (is (= (count (:player/queue new-player))
+                 (dec (count (:player/queue player-playing))))
+              "Actually removes a track")
+          (check-current-track (last (drop-last tracks))
+                               dequeued-fx
+                               false)))
+
+      (testing "dequeing all tracks individually"
+        (let [dequeued-fxs (reductions (fn [{p :db} id] (ui/player-dequeue-track p id))
+                                       {:db player-playing}
+                                       track-ids)
+              dequeued-fxs (rest dequeued-fxs)]
+          (testing "intermittent dequeues"
+            (doseq [[expected-track fx index] (map vector (rest tracks) (drop-last dequeued-fxs) (range))]
+              (testing (str "call number " (inc index))
+                (check-current-track expected-track fx false))))
+          (testing "properly clears at end"
+            (let [cleared-fx (last dequeued-fxs)]
+              (is (nil? (:player/playing (:db cleared-fx))))
+              (is (:player/paused (:db cleared-fx)))
+              (is (= [:all-tracks-cleared] (:dispatch cleared-fx))))))))))
