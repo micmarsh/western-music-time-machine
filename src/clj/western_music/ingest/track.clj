@@ -10,9 +10,9 @@
 
 (def ^:const bio-fetch-spec
   {::spec/composer {:composer/birth {:place/nation wiki/lookup-nation
-                                     :place/city wiki/lookup-city
+;                                     :place/city wiki/lookup-city
                                      :time/year wiki/lookup-year
-                                     :place/type :place/city
+                                     :place/type :place/nation ; :place/city
                                      :time/type :time/year}}})
 
 (defn full-composition [{:keys [yt-api-key
@@ -48,4 +48,6 @@
     (let [existing-data (edn/read-string (slurp compositions-path))
           new-data (add-new-composition existing-data yt-api-key artist title)]
       (spit compositions-path (pr-str new-data))))
+
+  (add-track "AIzaSyD-Xjqt2Npgo4o6NirfXBRd311pHIthg28" "Emīls Dārziņš" "Melanholiskais Valsis")
   )

@@ -52,7 +52,7 @@
 (defn translate [search-term]
   (get translations search-term search-term))
 
-(defcached id-search
+(defn id-search
   "Given a 'title' (a composer in current cases), return
    the wikidata entity id (example \"Q9695\")"
   [title]
@@ -68,7 +68,7 @@
                            :http-response response}))
           (throw e))))))
 
-(defcached properties-query
+(defn properties-query
   "Given a wikidata id, return the map of associated properties"
   [id]
   (println "yooo id" id)
