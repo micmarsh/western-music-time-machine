@@ -8,7 +8,8 @@
   :plugins [[lein-cljsbuild "1.1.3"]
             [lein-figwheel "0.5.4-7"]]
 
-  :source-paths ["src/clj" "src/cljc"]
+  :source-paths ["src/clj"
+                 "../western-music-core-logic/src/"]
 
   :profiles {:dev {:dependencies [[org.clojure/clojurescript "1.9.229"]
                                   [re-frame "0.8.0"]
@@ -43,6 +44,7 @@
   
   :clean-targets ^{:protect false} ["resources/public/js" "target"]
   
-  :cljsbuild {:builds {:client {:source-paths ["src/cljs" "src/cljc"] 
+  :cljsbuild {:builds {:client {:source-paths ["src/cljs"
+                                               "../western-music-core-logic/src/"] 
                                 :compiler     {:output-dir "resources/public/js"
                                                :output-to "resources/public/js/client.js"}}}})
