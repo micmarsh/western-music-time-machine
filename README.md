@@ -16,7 +16,7 @@ To automatically add to this file, run the function contained in the `comment` i
 Any other edits can be done manually to the file, although realastically better update and deletion tools need to be written. 
 
 ## More Information
- I used this project as the subject of [a presentation](http://micmarsh.github.io/techcomm) for a Technicnal Communication class when I finished my last semester of undergrad. 
+ I used this project as the subject of [a presentation](http://micmarsh.github.io/techcomm) for a Technical Communication class when I finished my last semester of undergrad. 
  
  Although the actual video and notes for the presentation have been lost, the bullet points in the presentation should give some insight into the motivations and design process.
 
